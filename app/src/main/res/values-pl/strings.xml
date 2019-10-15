@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">Explorea</string>
     <string name="login_text">Logowanie</string>
+    <string name="logout_button">Wyloguj</string>
+    <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
 </resources>

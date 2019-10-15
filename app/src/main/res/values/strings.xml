@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Explorea</string>
     <string name="login_text">Log In</string>
+    <string name="logout_button">Sign Out</string>
+    <string name="_WIP_send_request">Send request to server</string>
 
 </resources>

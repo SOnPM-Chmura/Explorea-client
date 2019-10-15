@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -14,11 +13,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = LoginActivity.class.getCanonicalName();
     private static final int RC_SIGN_IN = 9001;
-    private GoogleSignInClient mGoogleSignInClient;
+    public static GoogleSignInClient mGoogleSignInClient;
+
+    public static GoogleSignInAccount account = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,16 +33,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_in_button:
-                signIn();
-                break;
-        }
+        findViewById(R.id.sign_in_button).setOnClickListener(v -> signIn());
     }
 
     private void signIn() {
@@ -65,10 +57,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
 
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
+            LoginActivity.account = completedTask.getResult(ApiException.class);
             // Signed in successfully, return to main activity
-            MainActivity.account = account;
             Intent loginIntent = new Intent(this, MainActivity.class);
             startActivity(loginIntent);
         } catch (ApiException e) {
@@ -76,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            MainActivity.account = null;
+            LoginActivity.account = null;
         }
     }
 }
