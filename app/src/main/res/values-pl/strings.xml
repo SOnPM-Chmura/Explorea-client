@@ -4,4 +4,5 @@
     <string name="login_text">Logowanie</string>
     <string name="logout_button">Wyloguj</string>
     <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
+    <string name="request_error_response_msg">Błąd w trakcie łączenia z serwerem</string>
 </resources>

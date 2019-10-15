@@ -3,5 +3,6 @@
     <string name="login_text">Log In</string>
     <string name="logout_button">Sign Out</string>
     <string name="_WIP_send_request">Send request to server</string>
+    <string name="request_error_response_msg">Error while connecting with server</string>
 
 </resources>

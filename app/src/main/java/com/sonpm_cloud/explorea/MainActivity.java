@@ -3,17 +3,35 @@ package com.sonpm_cloud.explorea;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
+
+    private static final String TAG = MainActivity.class.getCanonicalName();
+    private String url = "https://explorea-server.azurewebsites.net/greeting?name=";
+    public RequestQueue requestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.sign_out_button).setOnClickListener(v -> signOut());
         findViewById(R.id.send_request_button).setOnClickListener(v -> sendRequest());
+        requestQueue = Volley.newRequestQueue(this);
     }
 
     private void launchLoginActivity() {
@@ -42,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                     .requestEmail().build();
             LoginActivity.mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         }
-        
+
         LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
                 LoginActivity.account = null;
                 launchLoginActivity();
@@ -50,6 +69,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendRequest() {
+        Context context = this;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                url + LoginActivity.account.getEmail(),
+                null,
+                response -> {
+                    try {
+                        Toast.makeText(context, response.getString("message"), Toast.LENGTH_LONG)
+                                .show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Log.w(TAG, "request response:failed message=" + e.getMessage());
+                    }
+                }, error -> {
+                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                        .show();
+                    Log.w(TAG, "request response:failed message=" + error.getNetworkTimeMs());
+                }
+        );
 
+        requestQueue.add(jsonObjectRequest);
     }
 }
