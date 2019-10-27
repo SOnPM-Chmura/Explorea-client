@@ -1,0 +1,34 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.sonpm_cloud.explorea">
+    <item
+        android:id="@+id/searchRoad"
+        android:orderInCategory="100"
+        android:title="wyszukiwanie tras"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/createRoad"
+        android:orderInCategory="100"
+        android:title="stwórz trasę"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/favouriteRoad"
+        android:orderInCategory="100"
+        android:title="ulubione trasy"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/myRoad"
+        android:orderInCategory="100"
+        android:title="moje trasy"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/singOut"
+        android:orderInCategory="100"
+        android:title="wyloguj"
+        app:showAsAction="never" />
+</menu>
