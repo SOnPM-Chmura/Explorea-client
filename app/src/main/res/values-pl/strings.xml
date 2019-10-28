@@ -5,4 +5,8 @@
     <string name="logout_button">Wyloguj</string>
     <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
     <string name="request_error_response_msg">Błąd w trakcie łączenia z serwerem</string>
+    <string name="search_track">Wyszukiwanie tras</string>
+    <string name="create_track">Stwórz trase</string>
+    <string name="mine_tracks">Moje trasy</string>
+    <string name="favourite_track">Ulubione trasy</string>
 </resources>

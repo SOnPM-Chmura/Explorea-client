@@ -4,5 +4,8 @@
     <string name="logout_button">Sign Out</string>
     <string name="_WIP_send_request">Send request to server</string>
     <string name="request_error_response_msg">Error while connecting with server</string>
-
+    <string name="search_track">Search track</string>
+    <string name="create_track">Create track</string>
+    <string name="mine_tracks">Mine tracks</string>
+    <string name="favourite_track">Favourite tracks</string>
 </resources>
