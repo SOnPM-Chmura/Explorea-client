@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <CheckedTextView
+        <CheckBox
             android:id="@+id/DefaultSortSelection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
