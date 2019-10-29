@@ -18,6 +18,7 @@
         <activity android:name=".CreateRoadActivity"></activity>
         <activity android:name=".FavouriteRoadActivity"></activity>
         <activity android:name=".MyRoadActivity"></activity>
+        <activity android:name=".RoadActivity"></activity>
         <activity android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">

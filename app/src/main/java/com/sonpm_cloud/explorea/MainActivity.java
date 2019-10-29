@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
             launchLoginActivity();
         }
 
-        findViewById(R.id.send_request_button).setOnClickListener(v -> sendRequest());
-        requestQueue = Volley.newRequestQueue(this);
+//        findViewById(R.id.send_request_button).setOnClickListener(v -> sendRequest());
+//        requestQueue = Volley.newRequestQueue(this);
     }
 
     @Override

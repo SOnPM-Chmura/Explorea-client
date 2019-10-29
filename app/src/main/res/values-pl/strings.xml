@@ -9,4 +9,15 @@
     <string name="create_track">Stwórz trase</string>
     <string name="mine_tracks">Moje trasy</string>
     <string name="favourite_track">Ulubione trasy</string>
+    <string name="create_road">STWÓRZ TRASE</string>
+    <string name="search_road">SZUKAJ TRASY</string>
+    <string name="start">START!</string>
+    <string name="default_sort">sortowanie domyślne</string>
+    <string name="search">SZUKAJ</string>
+    <string name="city">Miasto</string>
+    <string name="time_for_road">Czas przejazdu</string>
+    <string name="mode_of_transportation">Środek transportu</string>
+    <string name="add_road">Dodaj trasę</string>
+    <string name="favourite_road">Ulubione trasy</string>
+    <string name="my_road">Moje trasy</string>
 </resources>
