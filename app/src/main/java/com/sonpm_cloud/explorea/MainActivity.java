@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
 //        findViewById(R.id.send_request_button).setOnClickListener(v -> sendRequest());
 //        requestQueue = Volley.newRequestQueue(this);
+
+        findViewById(R.id.buttonRoad1).setOnClickListener(v -> startActivity(new Intent(v.getContext(), RoadActivity.class)));
     }
 
     @Override
