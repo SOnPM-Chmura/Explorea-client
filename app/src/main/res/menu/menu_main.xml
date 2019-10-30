@@ -1,34 +1,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.sonpm_cloud.explorea">
+    tools:context=".StartActivity">
     <item
-        android:id="@+id/searchRoad"
+        android:id="@+id/search_track_button"
         android:orderInCategory="100"
-        android:title="wyszukiwanie tras"
-        app:showAsAction="never" />
-
+        android:title="@string/search_track"
+        app:showAsAction="never"/>
     <item
-        android:id="@+id/createRoad"
+        android:id="@+id/create_track_button"
         android:orderInCategory="100"
-        android:title="stwórz trasę"
-        app:showAsAction="never" />
-
+        android:title="@string/create_track"
+        app:showAsAction="never"/>
     <item
-        android:id="@+id/favouriteRoad"
+        android:id="@+id/favourite_track_button"
         android:orderInCategory="100"
-        android:title="ulubione trasy"
-        app:showAsAction="never" />
-
+        android:title="@string/favourite_track"
+        app:showAsAction="never"/>
     <item
-        android:id="@+id/myRoad"
+        android:id="@+id/mine_track_button"
         android:orderInCategory="100"
-        android:title="moje trasy"
-        app:showAsAction="never" />
-
+        android:title="@string/mine_tracks"
+        app:showAsAction="never"/>
     <item
-        android:id="@+id/singOut"
+        android:id="@+id/logout_button"
         android:orderInCategory="100"
-        android:title="wyloguj"
-        app:showAsAction="never" />
+        android:title="@string/logout_button"
+        app:showAsAction="never"/>
 </menu>

@@ -3,7 +3,7 @@
     android:id="@+id/activity4_settings_fragment1"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_marginTop="10dp"
     android:gravity="center"
     android:orientation="vertical">
@@ -13,72 +13,78 @@
         android:layout_height="match_parent"
         android:layout_marginTop="100dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/city"
-            android:layout_width="82dp"
-            android:layout_height="32dp"
-            android:text="Miasto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/city"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_weight="1"/>
 
         <EditText
             android:id="@+id/citySelected"
-            android:layout_width="82dp"
-            android:layout_height="32dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
     <TextView
         android:id="@+id/time"
-        android:layout_width="150dp"
-        android:layout_height="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="70dp"
-        android:text="Czas przejazdu"
+        android:text="@string/time_for_road"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_weight="1"/>
 
     <Spinner
-        android:id="@+id/timeSpinner"
+        android:id="@+id/timeSpinner1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="70dp"
         android:layout_marginRight="70dp"
-        android:spinnerMode="dropdown"/>
+        android:spinnerMode="dropdown"
+        android:layout_weight="1"/>
 
     <TextView
         android:id="@+id/transport"
-        android:layout_width="150dp"
-        android:layout_height="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="70dp"
-        android:text="Środek transportu"
+        android:text="@string/mode_of_transportation"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_weight="1"/>
 
     <Spinner
-        android:id="@+id/transportSpinner"
+        android:id="@+id/transportSpinner1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="70dp"
         android:layout_marginRight="70dp"
-        android:spinnerMode="dropdown"/>
+        android:spinnerMode="dropdown"
+        android:layout_weight="1"/>
 
     <Button
-        android:id="@+id/buttonCheck"
+        android:id="@+id/buttonSearch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="70dp"
         android:layout_marginRight="50dip"
         android:layout_marginLeft="50dip"
         android:padding="0dp"
-        android:text="sprawdź" />
-
-
+        android:text="@string/search"
+        android:layout_weight="1"/>
 </LinearLayout>
