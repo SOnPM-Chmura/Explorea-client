@@ -1,19 +1,17 @@
 package com.sonpm_cloud.explorea;
 
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Activity5_Fragment1
@@ -57,8 +55,17 @@ public class Activity5_Fragment1
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        googleMap.setMinZoomPreference(12);
-        LatLng lodz = new LatLng(51.776667, 19.454722);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(lodz));
+        Pair<LatLng, Double> location = fetchLocationCoords();
+        googleMap.setMinZoomPreference(location.second.floatValue());
+        LatLng latLng = location.first;
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+    @Override
+    public void refreshCamera() {
+        Pair<LatLng, Double> location = fetchLocationCoords();
+        googleMap.setMinZoomPreference(location.second.floatValue());
+        LatLng latLng = location.first;
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 }
