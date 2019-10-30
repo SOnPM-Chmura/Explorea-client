@@ -33,6 +33,11 @@ public class Activity5_Fragment1
     String getMapViewBundleKey() { return "MapViewBundleKey"; }
 
     public static Activity5_Fragment1 newInstance() { return new Activity5_Fragment1(); }
+    public static Activity5_Fragment1 newInstance(Activity5_Fragment2 buddyFragment) {
+        Activity5_Fragment1 ret = new Activity5_Fragment1();
+        ret.viewModel = buddyFragment.viewModel;
+        return ret;
+    }
 
     @Nullable
     @Override
