@@ -13,11 +13,15 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
 
 public class Activity5_Fragment1
         extends AbstractGoogleMapContainerFragment {
 
-    private Activity5_Fragment1_ViewModel viewModel;
+    Activity5_Fragment_ViewModel viewModel;
 
     private GoogleMap googleMap;
 
@@ -29,6 +33,11 @@ public class Activity5_Fragment1
     String getMapViewBundleKey() { return "MapViewBundleKey"; }
 
     public static Activity5_Fragment1 newInstance() { return new Activity5_Fragment1(); }
+    public static Activity5_Fragment1 newInstance(Activity5_Fragment2 buddyFragment) {
+        Activity5_Fragment1 ret = new Activity5_Fragment1();
+        ret.viewModel = buddyFragment.viewModel;
+        return ret;
+    }
 
     @Nullable
     @Override
@@ -47,9 +56,8 @@ public class Activity5_Fragment1
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(this).get(Activity5_Fragment1_ViewModel.class);
-
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProviders.of(getActivity()).get(Activity5_Fragment_ViewModel.class);
+        System.out.println(viewModel.getPoints());
     }
 
     @Override
@@ -59,6 +67,42 @@ public class Activity5_Fragment1
         googleMap.setMinZoomPreference(location.second.floatValue());
         LatLng latLng = location.first;
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        googleMap.setOnPoiClickListener(pointOfInterest -> {
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(pointOfInterest.latLng);
+            Marker marker = googleMap.addMarker(markerOptions);
+            marker.setDraggable(true);
+
+            viewModel.addPoint(Pair.create(marker, " todo"));
+        });
+
+        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                marker.remove();
+                viewModel.removePoint(marker);
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+
+            }
+        });
+
+        List<Pair<Marker, String>> points = viewModel.getPoints();
+        viewModel.clearPoints();
+
+        for (Pair<Marker, String> point : points) {
+            viewModel.addPoint(Pair.create(
+                    googleMap.addMarker(new MarkerOptions().position(point.first.getPosition())),
+                    point.second));
+        }
     }
 
     @Override
