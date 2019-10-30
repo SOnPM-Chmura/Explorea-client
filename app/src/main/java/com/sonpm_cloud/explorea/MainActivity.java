@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.sign_out_button).setOnClickListener(v -> signOut());
         findViewById(R.id.send_request_button).setOnClickListener(v -> sendRequest());
+        findViewById(R.id.button).setOnClickListener(v -> createRoad());
         requestQueue = Volley.newRequestQueue(this);
     }
 
@@ -84,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    private void createRoad() {
+        Intent ac5 = new Intent(this, Activity5.class);
+        startActivity(ac5);
     }
 }
