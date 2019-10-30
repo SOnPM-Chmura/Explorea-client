@@ -52,7 +52,6 @@ public class Activity5_Fragment1
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity()).get(Activity5_Fragment_ViewModel.class);
-        System.out.println(viewModel.getPoints());
     }
 
     @Override
@@ -69,7 +68,7 @@ public class Activity5_Fragment1
             Marker marker = googleMap.addMarker(markerOptions);
             marker.setDraggable(true);
 
-            viewModel.addPoint(Pair.create(marker, " todo"));
+            viewModel.addPoint(Pair.create(marker, marker.getPosition().toString()));
         });
 
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
