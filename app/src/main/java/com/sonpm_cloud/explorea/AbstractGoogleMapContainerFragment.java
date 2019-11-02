@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +19,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.sonpm_cloud.explorea.data_classes.MutablePair;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -38,7 +38,7 @@ public abstract class AbstractGoogleMapContainerFragment
     FusedLocationProviderClient fusedLocationClient;
 
     @FunctionalInterface
-    private interface LocationGetter { Pair<LatLng, Double> get();}
+    private interface LocationGetter { MutablePair<LatLng, Double> get();}
     LocationGetter currentLocationGetter = this::getDefaultLocation;
 
     abstract int getMapViewId();
@@ -124,11 +124,11 @@ public abstract class AbstractGoogleMapContainerFragment
         }
     }
 
-    public Pair<LatLng, Double> fetchLocationCoords() {
-        return currentLocationGetter.get();
-    }
+    public MutablePair<LatLng, Double> fetchLocationCoords() { return currentLocationGetter.get(); }
 
-    private Pair<LatLng, Double> getCurrentLocation() {
+    public static float getDefZoom() { return 14.0f; }
+
+    private MutablePair<LatLng, Double> getCurrentLocation() {
 
         Task<Location> locationTask = fusedLocationClient.getLastLocation();
 
@@ -158,11 +158,11 @@ public abstract class AbstractGoogleMapContainerFragment
 
         if (result == null) return getDefaultLocation();
 
-        return Pair.create(result, 14.0);
+        return MutablePair.create(result, (double) getDefZoom());
     }
 
-    private Pair<LatLng, Double> getDefaultLocation() {
-        return Pair.create(new LatLng(51.925, 19.13075), 5.6);
+    private MutablePair<LatLng, Double> getDefaultLocation() {
+        return MutablePair.create(new LatLng(51.925, 19.13075), 5.6);
     }
 
     abstract void refreshCamera();

@@ -1,7 +1,6 @@
 package com.sonpm_cloud.explorea;
 
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +11,19 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sonpm_cloud.explorea.data_classes.MutablePair;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 public class Activity5_Fragment1
         extends AbstractGoogleMapContainerFragment {
@@ -24,7 +31,7 @@ public class Activity5_Fragment1
     Activity5_Fragment_ViewModel viewModel;
 
     private GoogleMap googleMap;
-
+    private HashMap<Marker, LatLng> markers;
 
     @Override
     int getMapViewId() { return R.id.map_view; }
@@ -57,78 +64,84 @@ public class Activity5_Fragment1
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        Pair<LatLng, Double> location = fetchLocationCoords();
-        googleMap.setMinZoomPreference(location.second.floatValue());
+        this.markers = new HashMap<>();
+        MutablePair<LatLng, Double> location = fetchLocationCoords();
         LatLng latLng = location.first;
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        float zoom = location.second.floatValue();
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                CameraPosition.fromLatLngZoom(latLng, zoom)
+        ));
 
-        googleMap.setOnPoiClickListener(pointOfInterest -> {
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(pointOfInterest.latLng);
-            Marker marker = googleMap.addMarker(markerOptions);
-            marker.setDraggable(true);
+        googleMap.setOnMarkerClickListener(marker -> true);
 
-            viewModel.addPoint(Pair.create(marker, marker.getPosition().toString()));
-        });
+        googleMap.setOnPoiClickListener(pointOfInterest -> viewModel.addPoint(
+                MutablePair.create(pointOfInterest.latLng, pointOfInterest.latLng.toString())));
 
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) {
                 marker.remove();
-                viewModel.removePoint(marker);
+                viewModel.removePoint(markers.get(marker));
             }
 
             @Override
-            public void onMarkerDrag(Marker marker) {
-
-            }
+            public void onMarkerDrag(Marker marker) {  }
 
             @Override
-            public void onMarkerDragEnd(Marker marker) {
-
-            }
+            public void onMarkerDragEnd(Marker marker) {  }
         });
 
-        List<Pair<Marker, String>> points = viewModel.getPoints();
-        viewModel.clearPoints();
+        List<MutablePair<LatLng, String>> points = viewModel.getListPoints();
 
         Marker marker;
-
-        for (Pair<Marker, String> point : points) {
-            viewModel.addPoint(Pair.create(
+        for (MutablePair<LatLng, String> point : points) {
+            markers.put(
                     marker = googleMap
-                            .addMarker(new MarkerOptions().position(point.first.getPosition())),
-                    point.second));
+                            .addMarker(new MarkerOptions().position(point.first)),
+                    point.first);
             marker.setDraggable(true);
         }
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (this.googleMap != null) {
-            this.googleMap.clear();
+        viewModel.getPoints().observe(this, _points -> {
 
-            List<Pair<Marker, String>> points = viewModel.getPoints();
-            viewModel.clearPoints();
+            List<LatLng> temp;
+            List<LatLng> toRemove = temp = new LinkedList<>(markers.values());
+            List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
+                    .collect(Collectors.toList());
 
-            Marker marker;
 
-            for (Pair<Marker, String> point : points) {
-                viewModel.addPoint(Pair.create(
-                        marker = googleMap
-                                .addMarker(new MarkerOptions().position(point.first.getPosition())),
-                        point.second));
-                marker.setDraggable(true);
+            toRemove.removeAll(toAdd);
+            toAdd.removeAll(temp);
+
+            if (toRemove.size() > 0) {
+                List<Marker> removing = StreamSupport.stream(markers.entrySet())
+                        .filter(m -> toRemove.contains(m.getValue()))
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+
+                StreamSupport.stream(removing).forEach(m -> {
+                    m.remove();
+                    markers.remove(m);
+                });
             }
-        }
+
+            if (toAdd.size() > 0) {
+                StreamSupport.stream(toAdd).forEach(m -> {
+                    Marker mm = googleMap.addMarker(new MarkerOptions().position(m));
+                    mm.setDraggable(true);
+                    markers.put(mm, m);
+                });
+            }
+        });
     }
 
     @Override
     public void refreshCamera() {
-        Pair<LatLng, Double> location = fetchLocationCoords();
-        googleMap.setMinZoomPreference(location.second.floatValue());
+        MutablePair<LatLng, Double> location = fetchLocationCoords();
         LatLng latLng = location.first;
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        float zoom = location.second.floatValue();
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                CameraPosition.fromLatLngZoom(latLng, zoom)
+        ));
     }
 }

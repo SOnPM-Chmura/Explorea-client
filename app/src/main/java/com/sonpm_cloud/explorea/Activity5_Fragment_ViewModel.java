@@ -1,8 +1,6 @@
 package com.sonpm_cloud.explorea;
 
 import android.graphics.Color;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +9,9 @@ import android.widget.TextView;
 import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.LatLng;
+import com.sonpm_cloud.explorea.data_classes.LiveList;
+import com.sonpm_cloud.explorea.data_classes.MutablePair;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,30 +20,31 @@ import java.util.List;
 public class Activity5_Fragment_ViewModel
         extends ViewModel {
 
-    private List<Pair<Marker, String>> points;
+    private LiveList<MutablePair<LatLng, String>> points;
 
     private RecyclerAdapter adapter;
     public RecyclerAdapter getAdapter() { return adapter; }
 
-    public List<Pair<Marker, String>> getPoints() { return new LinkedList<>(points); }
+    public List<MutablePair<LatLng, String>> getListPoints() { return new LinkedList<>(points); }
+    public LiveList<MutablePair<LatLng, String>> getPoints() { return points; }
     public void clearPoints() {
         points.clear();
         adapter.clearItems();
     }
 
     public Activity5_Fragment_ViewModel() {
-        points = new LinkedList<>();
+        points = new LiveList<>(new LinkedList<>());
         adapter = new RecyclerAdapter(this);
     }
 
-    public void addPoint(Pair<Marker, String> point) {
+    public void addPoint(MutablePair<LatLng, String> point) {
         points.add(point);
         adapter.addItem(point.second);
     }
 
-    public void removePoint(Pair<Marker, String> point) { removePoint(point.first); }
+    public void removePoint(MutablePair<LatLng, String> point) { removePoint(point.first); }
 
-    public void removePoint(Marker point) {
+    public void removePoint(LatLng point) {
         for (int i = 0; i < points.size(); i++) {
             if (points.get(i).first.equals(point)) {
                 points.remove(i);
