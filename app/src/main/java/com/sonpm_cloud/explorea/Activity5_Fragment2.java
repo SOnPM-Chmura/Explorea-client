@@ -1,6 +1,7 @@
 package com.sonpm_cloud.explorea;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,9 +31,8 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
     private GoogleMap googleMap;
 
-    RecyclerView recyclerView;
-    RecyclerAdapter recyclerAdapter;
-    List<String> labelList = new LinkedList<>();
+    private RecyclerView recyclerView;
+    private Activity5_Fragment_ViewModel.RecyclerAdapter recyclerAdapter;
 
     public static Activity5_Fragment2 newInstance() { return new Activity5_Fragment2(); }
 
@@ -56,11 +58,8 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
 
         recyclerView = getView().findViewById(R.id.recycler_view);
-        labelList = StreamSupport.stream(viewModel.getPoints())
-                .map(markerStringPair -> markerStringPair.second)
-                .collect(Collectors.toList());
 
-        recyclerAdapter = new RecyclerAdapter(labelList);
+        recyclerAdapter = viewModel.getAdapter();
 
         ItemTouchHelper.Callback callback = new ItemMoveCallback(recyclerAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
@@ -86,5 +85,32 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
         googleMap.setMinZoomPreference(location.second.floatValue());
         LatLng latLng = location.first;
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        List<Pair<Marker, String>> points = viewModel.getPoints();
+        viewModel.clearPoints();
+
+        for (Pair<Marker, String> point : points) {
+            viewModel.addPoint(Pair.create(
+                    googleMap.addMarker(new MarkerOptions().position(point.first.getPosition())),
+                    point.second));
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (this.googleMap != null) {
+
+            this.googleMap.clear();
+
+            List<Pair<Marker, String>> points = viewModel.getPoints();
+            viewModel.clearPoints();
+
+            for (Pair<Marker, String> point : points) {
+                viewModel.addPoint(Pair.create(
+                        googleMap.addMarker(new MarkerOptions().position(point.first.getPosition())),
+                        point.second));
+            }
+        }
     }
 }

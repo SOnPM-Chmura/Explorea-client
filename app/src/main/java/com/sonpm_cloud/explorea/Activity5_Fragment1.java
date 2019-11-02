@@ -92,10 +92,35 @@ public class Activity5_Fragment1
         List<Pair<Marker, String>> points = viewModel.getPoints();
         viewModel.clearPoints();
 
+        Marker marker;
+
         for (Pair<Marker, String> point : points) {
             viewModel.addPoint(Pair.create(
-                    googleMap.addMarker(new MarkerOptions().position(point.first.getPosition())),
+                    marker = googleMap
+                            .addMarker(new MarkerOptions().position(point.first.getPosition())),
                     point.second));
+            marker.setDraggable(true);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (this.googleMap != null) {
+            this.googleMap.clear();
+
+            List<Pair<Marker, String>> points = viewModel.getPoints();
+            viewModel.clearPoints();
+
+            Marker marker;
+
+            for (Pair<Marker, String> point : points) {
+                viewModel.addPoint(Pair.create(
+                        marker = googleMap
+                                .addMarker(new MarkerOptions().position(point.first.getPosition())),
+                        point.second));
+                marker.setDraggable(true);
+            }
         }
     }
 
