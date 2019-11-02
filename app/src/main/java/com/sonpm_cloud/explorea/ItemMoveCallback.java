@@ -23,7 +23,8 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {  }
 
     @Override
-    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+    public int getMovementFlags(@NonNull RecyclerView recyclerView,
+                                @NonNull RecyclerView.ViewHolder viewHolder) {
         int ret = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
         return makeMovementFlags(ret, 0);
     }
@@ -40,9 +41,9 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder instanceof RecyclerAdapter.ViewHolder) {
-                RecyclerAdapter.ViewHolder holder =
-                        (RecyclerAdapter.ViewHolder) viewHolder;
+            if (viewHolder instanceof Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder) {
+                Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder holder =
+                        (Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder) viewHolder;
                 adapter.onRowSelected(holder);
             }
         }
@@ -56,9 +57,9 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
             @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
-        if (viewHolder instanceof RecyclerAdapter.ViewHolder) {
-            RecyclerAdapter.ViewHolder holder =
-                    (RecyclerAdapter.ViewHolder) viewHolder;
+        if (viewHolder instanceof Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder) {
+            Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder holder =
+                    (Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder) viewHolder;
             adapter.onRowClear(holder);
         }
     }
@@ -66,8 +67,8 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     public interface ItemTouchHelperContract {
 
         void onRowMoved(int fromPosition, int toPosition);
-        void onRowSelected(RecyclerAdapter.ViewHolder viewHolder);
-        void onRowClear(RecyclerAdapter.ViewHolder viewHolder);
+        void onRowSelected(Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder viewHolder);
+        void onRowClear(Activity5_Fragment_ViewModel.RecyclerAdapter.ViewHolder viewHolder);
 
     }
 }

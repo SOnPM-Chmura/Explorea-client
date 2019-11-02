@@ -5,4 +5,7 @@
     <string name="logout_button">Wyloguj</string>
     <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
     <string name="request_error_response_msg">Błąd w trakcie łączenia z serwerem</string>
+    <string name="add_route">Dodaj trasę</string>
+    <string name="select_points">Wybierz punkty</string>
+    <string name="order_points">Wybierz kolejność</string>
 </resources>

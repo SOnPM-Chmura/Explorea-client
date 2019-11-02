@@ -32,7 +32,8 @@ public class LoginActivity extends AppCompatActivity {
 
         String web_id = "";
         try {
-            ApplicationInfo app = this.getPackageManager().getApplicationInfo(this.getPackageName(), PackageManager.GET_META_DATA);
+            ApplicationInfo app = this.getPackageManager().getApplicationInfo(this.getPackageName(),
+                    PackageManager.GET_META_DATA);
             Bundle bundle = app.metaData;
             web_id = (String) bundle.get("com.sonpm_cloud.explorea.api.WEB_ID");
 

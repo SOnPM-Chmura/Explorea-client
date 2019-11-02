@@ -37,8 +37,8 @@ public class Activity5 extends AppCompatActivity {
             fragment1 = Activity5_Fragment1.newInstance();
             fragment2 = Activity5_Fragment2.newInstance();
             adapter = new Activity5_PageAdapter(fragmentManager,
-                    Pair.create("Choose points", fragment1),
-                    Pair.create("Choose order", fragment2));
+                    Pair.create(getString(R.string.select_points), fragment1),
+                    Pair.create(getString(R.string.order_points), fragment2));
             viewPager.setAdapter(adapter);
             tabLayout.setupWithViewPager(viewPager);
             viewPager.setOffscreenPageLimit(adapter.fragments.size());
@@ -46,7 +46,10 @@ public class Activity5 extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

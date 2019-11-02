@@ -4,5 +4,8 @@
     <string name="logout_button">Sign Out</string>
     <string name="_WIP_send_request">Send request to server</string>
     <string name="request_error_response_msg">Error while connecting with server</string>
+    <string name="add_route">Add route</string>
+    <string name="select_points">Select points</string>
+    <string name="order_points">Order points</string>
 
 </resources>
