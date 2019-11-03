@@ -1,5 +1,6 @@
-package com.sonpm_cloud.explorea;
+package com.sonpm_cloud.explorea.activity_5;
 
+import android.graphics.Point;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,14 +9,20 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sonpm_cloud.explorea.AbstractGoogleMapContainerFragment;
+import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
+import com.sonpm_cloud.explorea.data_classes.U;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,21 +32,19 @@ import java.util.Map;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
-public class Activity5_Fragment1
-        extends AbstractGoogleMapContainerFragment {
+public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
-    Activity5_Fragment_ViewModel viewModel;
+    private Activity5_Fragment_ViewModel viewModel;
 
     private GoogleMap googleMap;
     private HashMap<Marker, LatLng> markers;
+    private boolean isMapReady = false;
 
-    @Override
-    int getMapViewId() { return R.id.map_view; }
+    private RecyclerView recyclerView;
+    private Activity5_Fragment_ViewModel.RecyclerAdapter recyclerAdapter;
 
-    @Override
-    String getMapViewBundleKey() { return "MapViewBundleKey"; }
+    public static Activity5_Fragment2 newInstance() { return new Activity5_Fragment2(); }
 
-    public static Activity5_Fragment1 newInstance() { return new Activity5_Fragment1(); }
 
     @Nullable
     @Override
@@ -49,7 +54,7 @@ public class Activity5_Fragment1
             @Nullable Bundle savedInstanceState
     ) {
         return inflater.inflate(
-                R.layout.activity5_markingpoints_fragment1,
+                R.layout.activity5_pointslist_fragment2,
                 container,
                 false
         );
@@ -58,8 +63,27 @@ public class Activity5_Fragment1
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(Activity5_Fragment_ViewModel.class);
+        viewModel = ViewModelProviders.of(requireActivity()).get(Activity5_Fragment_ViewModel.class);
+
+        recyclerView = requireView().findViewById(R.id.recycler_view);
+
+        recyclerAdapter = viewModel.getAdapter();
+
+        ItemTouchHelper.Callback callback = new Activity5_Fragment_ViewModel
+                .ItemMoveCallback(recyclerAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setAdapter(recyclerAdapter);
     }
+
+    @Override
+    protected int getMapViewId() { return R.id.map_view2; }
+
+    @Override
+    protected String getMapViewBundleKey() { return "MapViewBundleKey2"; }
+
+    @Override
+    protected void refreshCamera() {  }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -72,24 +96,9 @@ public class Activity5_Fragment1
                 CameraPosition.fromLatLngZoom(latLng, zoom)
         ));
 
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
+
         googleMap.setOnMarkerClickListener(marker -> true);
-
-        googleMap.setOnPoiClickListener(pointOfInterest -> viewModel.addPoint(
-                MutablePair.create(pointOfInterest.latLng, pointOfInterest.latLng.toString())));
-
-        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-                marker.remove();
-                viewModel.removePoint(markers.get(marker));
-            }
-
-            @Override
-            public void onMarkerDrag(Marker marker) {  }
-
-            @Override
-            public void onMarkerDragEnd(Marker marker) {  }
-        });
 
         List<MutablePair<LatLng, String>> points = viewModel.getListPoints();
 
@@ -128,20 +137,37 @@ public class Activity5_Fragment1
             if (toAdd.size() > 0) {
                 StreamSupport.stream(toAdd).forEach(m -> {
                     Marker mm = googleMap.addMarker(new MarkerOptions().position(m));
-                    mm.setDraggable(true);
                     markers.put(mm, m);
                 });
             }
         });
+        isMapReady = true;
     }
 
     @Override
-    public void refreshCamera() {
-        MutablePair<LatLng, Double> location = fetchLocationCoords();
-        LatLng latLng = location.first;
-        float zoom = location.second.floatValue();
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                CameraPosition.fromLatLngZoom(latLng, zoom)
-        ));
+    public void onResume() {
+        super.onResume();
+        if (this.googleMap != null && isMapReady) {
+            LatLng[] markers = StreamSupport.stream(this.markers.entrySet())
+                    .map(Map.Entry::getValue)
+                    .toArray(LatLng[]::new);
+            if (this.markers.size() > 1) {
+                float dp = 32;
+                LatLngBounds.Builder bounds = LatLngBounds.builder();
+                for (LatLng marker : markers) bounds.include(marker);
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),
+                        (int) U.dp_px(dp, requireContext())));
+                int viewHeight = (int) U.dp_px(U.px_dp(
+                        mapView.getHeight(), requireContext())/2 - dp/2, requireContext());
+                int viewWidth = mapView.getWidth()/2;
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(
+                        googleMap.getProjection()
+                                .fromScreenLocation(new Point(viewWidth, viewHeight))));
+            } else if (this.markers.size() == 1) {
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(markers[0], getDefZoom())));
+            }
+
+        }
     }
 }

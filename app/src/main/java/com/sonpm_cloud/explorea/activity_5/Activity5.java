@@ -1,4 +1,4 @@
-package com.sonpm_cloud.explorea;
+package com.sonpm_cloud.explorea.activity_5;
 
 import android.os.Bundle;
 import android.util.Pair;
@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.sonpm_cloud.explorea.R;
 
 public class Activity5 extends AppCompatActivity {
 

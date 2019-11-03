@@ -23,7 +23,7 @@
             android:value="685250076671-v2uk6ii19acgok6n2fa8jmog7uqsfamq.apps.googleusercontent.com" />
         <activity android:name=".LoginActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".Activity5"
+        <activity android:name=".activity_5.Activity5"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity"

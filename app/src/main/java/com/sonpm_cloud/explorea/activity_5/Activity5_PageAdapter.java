@@ -1,7 +1,8 @@
-package com.sonpm_cloud.explorea;
+package com.sonpm_cloud.explorea.activity_5;
 
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -22,15 +23,14 @@ public class Activity5_PageAdapter extends FragmentPagerAdapter {
         }
     }
 
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         return fragments.values().toArray(new Fragment[0])[position];
     }
 
     @Override
-    public int getCount() {
-        return fragments.size();
-    }
+    public int getCount() { return fragments.size(); }
 
     @Nullable
     @Override

@@ -33,16 +33,16 @@ public abstract class AbstractGoogleMapContainerFragment
         ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int REQUEST_LOCATION = 420;
-    MapView mapView;
-    LocationManager locationManager;
-    FusedLocationProviderClient fusedLocationClient;
+    protected MapView mapView;
+    private LocationManager locationManager;
+    private FusedLocationProviderClient fusedLocationClient;
 
     @FunctionalInterface
     private interface LocationGetter { MutablePair<LatLng, Double> get();}
-    LocationGetter currentLocationGetter = this::getDefaultLocation;
+    private LocationGetter currentLocationGetter = this::getDefaultLocation;
 
-    abstract int getMapViewId();
-    abstract String getMapViewBundleKey();
+    protected abstract int getMapViewId();
+    protected abstract String getMapViewBundleKey();
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public abstract class AbstractGoogleMapContainerFragment
 
 
         if (
-            ActivityCompat.checkSelfPermission(getContext(),
+            ActivityCompat.checkSelfPermission(requireContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(
@@ -64,10 +64,10 @@ public abstract class AbstractGoogleMapContainerFragment
         } else {
             currentLocationGetter = this::getCurrentLocation;
         }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        locationManager = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
 
-        mapView = getView().findViewById(getMapViewId());
+        mapView = requireView().findViewById(getMapViewId());
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
     }
@@ -124,9 +124,9 @@ public abstract class AbstractGoogleMapContainerFragment
         }
     }
 
-    public MutablePair<LatLng, Double> fetchLocationCoords() { return currentLocationGetter.get(); }
+    protected MutablePair<LatLng, Double> fetchLocationCoords() { return currentLocationGetter.get(); }
 
-    public static float getDefZoom() { return 14.0f; }
+    protected static float getDefZoom() { return 14.0f; }
 
     private MutablePair<LatLng, Double> getCurrentLocation() {
 
@@ -165,5 +165,5 @@ public abstract class AbstractGoogleMapContainerFragment
         return MutablePair.create(new LatLng(51.925, 19.13075), 5.6);
     }
 
-    abstract void refreshCamera();
+    protected abstract void refreshCamera();
 }
