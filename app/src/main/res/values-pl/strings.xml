@@ -20,4 +20,8 @@
     <string name="add_road">Dodaj trasę</string>
     <string name="favourite_road">Ulubione trasy</string>
     <string name="my_road">Moje trasy</string>
+    <string name="select_points">Wybierz punkty</string>
+    <string name="order_points">Wybierz kolejność</string>
+    <string name="routes_found">Znalezione trasy</string>
+    <string name="welcome_to_explorea">Witaj w Explorea</string>
 </resources>

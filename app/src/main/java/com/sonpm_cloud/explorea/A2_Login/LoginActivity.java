@@ -1,10 +1,13 @@
-package com.sonpm_cloud.explorea;
+package com.sonpm_cloud.explorea.A2_Login;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -12,11 +15,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.sonpm_cloud.explorea.MainActivity;
+import com.sonpm_cloud.explorea.R;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = LoginActivity.class.getCanonicalName();
     private static final int RC_SIGN_IN = 9001;
+    @SuppressLint("StaticFieldLeak")
     public static GoogleSignInClient mGoogleSignInClient;
 
     public static GoogleSignInAccount account = null;
@@ -26,10 +32,23 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        String web_id = "";
+        try {
+            ApplicationInfo app = this.getPackageManager().getApplicationInfo(this.getPackageName(),
+                    PackageManager.GET_META_DATA);
+            Bundle bundle = app.metaData;
+            web_id = (String) bundle.get("com.sonpm_cloud.explorea.api.WEB_ID");
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail().build();
+                .requestEmail().requestIdToken(web_id).build();
         // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
