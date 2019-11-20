@@ -1,4 +1,4 @@
-package com.sonpm_cloud.explorea;
+package com.sonpm_cloud.explorea.maps;
 
 import android.Manifest;
 import android.content.Context;

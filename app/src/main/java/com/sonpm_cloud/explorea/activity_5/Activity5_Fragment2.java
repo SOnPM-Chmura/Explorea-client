@@ -20,10 +20,12 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
 import com.sonpm_cloud.explorea.data_classes.U;
-import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
+import com.sonpm_cloud.explorea.maps.route_creating.RouteCreatingStrategy;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -115,6 +117,17 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
         }
 
         viewModel.getPoints().observe(this, _points -> {
+
+            if (lastPoly != null) {
+                lastPoly.remove();
+            }
+            PolylineOptions pOpt = RouteCreatingStrategy.getRecomendedStrategy(
+                    StreamSupport.stream(viewModel.getListPoints())
+                            .map(p -> p.first)
+                            .toArray(LatLng[]::new)
+            )
+                    .createPolylineRoute().polylineOptions;
+            if (pOpt != null) lastPoly = googleMap.addPolyline(pOpt);
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
