@@ -19,10 +19,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sonpm_cloud.explorea.AbstractGoogleMapContainerFragment;
+import com.google.android.gms.maps.model.Polyline;
 import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
 import com.sonpm_cloud.explorea.data_classes.U;
+import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,6 +34,8 @@ import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
+
+    private Polyline lastPoly;
 
     private Activity5_Fragment_ViewModel viewModel;
 
@@ -113,11 +116,11 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
         viewModel.getPoints().observe(this, _points -> {
 
-            List<LatLng> temp;
-            List<LatLng> toRemove = temp = new LinkedList<>(markers.values());
+            List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
                     .collect(Collectors.toList());
 
+            List<LatLng> temp = new LinkedList<>(toRemove);
 
             toRemove.removeAll(toAdd);
             toAdd.removeAll(temp);
@@ -167,7 +170,6 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                         CameraPosition.fromLatLngZoom(markers[0], getDefZoom())));
             }
-
         }
     }
 }

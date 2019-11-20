@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sonpm_cloud.explorea.AbstractGoogleMapContainerFragment;
+import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
 
@@ -60,7 +60,7 @@ public class Activity5_Fragment1
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(Activity5_Fragment_ViewModel.class);
+        viewModel = ViewModelProviders.of(requireActivity()).get(Activity5_Fragment_ViewModel.class);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class Activity5_Fragment1
         googleMap.setOnMarkerClickListener(marker -> true);
 
         googleMap.setOnPoiClickListener(pointOfInterest -> viewModel.addPoint(
-                MutablePair.create(pointOfInterest.latLng, pointOfInterest.latLng.toString())));
+                MutablePair.create(pointOfInterest.latLng, pointOfInterest.name)));
 
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
@@ -106,10 +106,11 @@ public class Activity5_Fragment1
 
         viewModel.getPoints().observe(this, _points -> {
 
-            List<LatLng> temp;
-            List<LatLng> toRemove = temp = new LinkedList<>(markers.values());
+            List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
                     .collect(Collectors.toList());
+
+            List<LatLng> temp = new LinkedList<>(toRemove);
 
 
             toRemove.removeAll(toAdd);

@@ -1,6 +1,7 @@
 package com.sonpm_cloud.explorea.activity_5;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -32,8 +33,8 @@ public class Activity5 extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         if (tabLayout != null) {
             fragment1 = Activity5_Fragment1.newInstance();
             fragment2 = Activity5_Fragment2.newInstance();
@@ -44,6 +45,12 @@ public class Activity5 extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
             viewPager.setOffscreenPageLimit(adapter.fragments.size());
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 
     @Override
