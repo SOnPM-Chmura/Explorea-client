@@ -2,6 +2,7 @@ package com.sonpm_cloud.explorea.activity_5;
 
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
@@ -38,6 +40,7 @@ import java8.util.stream.StreamSupport;
 public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
     private Polyline lastPoly;
+    private float lastDist;
 
     private Activity5_Fragment_ViewModel viewModel;
 
@@ -79,6 +82,7 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(recyclerAdapter);
+        requireView().findViewById(R.id.buttonCheck).setOnClickListener(this::sendRoute);
     }
 
     @Override
@@ -121,13 +125,17 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
             if (lastPoly != null) {
                 lastPoly.remove();
             }
-            PolylineOptions pOpt = RouteCreatingStrategy.getRecomendedStrategy(
+            RouteCreatingStrategy.PolylineRoute r = RouteCreatingStrategy.getRecomendedStrategy(
                     StreamSupport.stream(viewModel.getListPoints())
                             .map(p -> p.first)
                             .toArray(LatLng[]::new)
             )
-                    .createPolylineRoute().polylineOptions;
-            if (pOpt != null) lastPoly = googleMap.addPolyline(pOpt);
+                    .createPolylineRoute();
+            PolylineOptions pOpt = r.polylineOptions;
+            if (pOpt != null) {
+                lastPoly = googleMap.addPolyline(pOpt);
+                lastDist = r.length;
+            }
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
@@ -184,5 +192,19 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                         CameraPosition.fromLatLngZoom(markers[0], getDefZoom())));
             }
         }
+    }
+
+    private void sendRoute(View view) {
+        Route ret = new Route(-1,
+                StreamSupport.stream(viewModel.getListPoints())
+                        .map(p -> p.first)
+                        .collect(Collectors.toList()),
+                -1f,
+                (int)lastDist,
+                (int)lastDist,
+                (int)lastDist/5*60,
+                (int)lastDist/20*60,
+                "");
+        Log.e("sendRoute", ret.toString());
     }
 }
