@@ -199,11 +199,11 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                 StreamSupport.stream(viewModel.getListPoints())
                         .map(p -> p.first)
                         .collect(Collectors.toList()),
-                -1f,
-                (int)lastDist,
-                (int)lastDist,
-                (int)lastDist/5*60,
-                (int)lastDist/20*60,
+                0f,
+                (int) lastDist,
+                (int) lastDist,
+                (int) lastDist/5*60,
+                (int) lastDist/20*60,
                 "");
         Log.e("sendRoute", ret.toString());
     }
