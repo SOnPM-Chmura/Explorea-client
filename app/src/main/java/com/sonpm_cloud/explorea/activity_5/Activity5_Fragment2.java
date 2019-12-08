@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.R;
@@ -195,10 +196,13 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
     }
 
     private void sendRoute(View view) {
-        Route ret = new Route(-1,
-                StreamSupport.stream(viewModel.getListPoints())
-                        .map(p -> p.first)
-                        .collect(Collectors.toList()),
+        List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
+                .map(p -> p.first)
+                .collect(Collectors.toList());
+        Route ret = new DirectionsRoute(-1,
+                lll,
+                U.getCurrentMillis(),
+                lll,
                 0f,
                 (int) lastDist,
                 (int) lastDist,

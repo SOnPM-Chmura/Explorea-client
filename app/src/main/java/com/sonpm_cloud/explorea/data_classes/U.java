@@ -3,6 +3,9 @@ package com.sonpm_cloud.explorea.data_classes;
 import android.content.Context;
 import android.util.TypedValue;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 /**
  * Class for utilities and conversions
  */
@@ -50,5 +53,27 @@ public class U {
     public static float px_dp(int px, Context context) {
         return px / TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1,
                 context.getResources().getDisplayMetrics());
+    }
+
+    /**
+     * Gets current millisecond count from Epoch in UTC timezone
+     * @return Time from Epoch in ms (UTC)
+     */
+    public static long getCurrentMillis() {
+        return Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTimeInMillis();
+    }
+
+    /**
+     * One hour in milliseconds
+     */
+    public static final long HOUR = 60 * 60 * 1000;
+
+    /**
+     * Checkif hour has passed
+     * @param from time which you test
+     * @return {@code true} if hour has passed from {@code from}
+     */
+    public static boolean hasHourPassed(long from) {
+        return  getCurrentMillis() > (from + HOUR);
     }
 }
