@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.sonpm_cloud.explorea">
 
     <dist:module dist:instant="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".MainActivity">
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBZhqK7gfpGG6nM0ryiG5K1UwV1fRfTcZc" />
+        <meta-data android:name="com.sonpm_cloud.explorea.api.WEB_ID"
+            android:value="685250076671-v2uk6ii19acgok6n2fa8jmog7uqsfamq.apps.googleusercontent.com" />
+
+        <activity android:name=".A2_Login.LoginActivity" />
+        <activity android:name=".A4_SearchRoad.SearchRoadActivity" />
+        <activity android:name=".A5_CreateRoad.CreateRoadActivity" />
+        <activity android:name=".A6_FavouriteRoad.FavouriteRoadActivity" />
+        <activity android:name=".A7_MyRoad.MyRoadActivity" />
+        <activity android:name=".A4_2_RoadActivity.RoadActivity" />
+        <activity android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
