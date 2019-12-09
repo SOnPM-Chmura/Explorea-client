@@ -1,11 +1,7 @@
 package com.sonpm_cloud.explorea.maps.route_creating;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 
 public abstract class RouteCreatingStrategy {
 
@@ -17,20 +13,9 @@ public abstract class RouteCreatingStrategy {
         this.points = points;
     }
 
-    public abstract PolylineRoute createPolylineRoute();
+    public abstract DirectionsRoute createPolylineRoute();
 
     public static RouteCreatingStrategy getRecomendedStrategy(LatLng[] points) {
         return new StraightLineRouteCreatingStrategy(points);
-    }
-
-    public static class PolylineRoute {
-
-        public final float length;
-        public final PolylineOptions polylineOptions;
-
-        public PolylineRoute(float length, PolylineOptions polylineOptions) {
-            this.length = length;
-            this.polylineOptions = polylineOptions;
-        }
     }
 }

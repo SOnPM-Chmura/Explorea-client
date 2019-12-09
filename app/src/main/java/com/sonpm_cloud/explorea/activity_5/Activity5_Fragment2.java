@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
@@ -41,7 +42,11 @@ import java8.util.stream.StreamSupport;
 public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
     private Polyline lastPoly;
-    private float lastDist;
+    private int lastDistFoot;
+    private int lastDistBike;
+    private int lastTimeFoot;
+    private int lastTimeBike;
+    private String lastCity;
 
     private Activity5_Fragment_ViewModel viewModel;
 
@@ -126,16 +131,20 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
             if (lastPoly != null) {
                 lastPoly.remove();
             }
-            RouteCreatingStrategy.PolylineRoute r = RouteCreatingStrategy.getRecomendedStrategy(
+            DirectionsRoute r = RouteCreatingStrategy.getRecomendedStrategy(
                     StreamSupport.stream(viewModel.getListPoints())
                             .map(p -> p.first)
                             .toArray(LatLng[]::new)
             )
                     .createPolylineRoute();
-            PolylineOptions pOpt = r.polylineOptions;
-            if (pOpt != null) {
+            if (r != null) {
+                PolylineOptions pOpt = new PolylineOptions().addAll(PolyUtil.decode(r.encodedDirections));
                 lastPoly = googleMap.addPolyline(pOpt);
-                lastDist = r.length;
+                lastDistFoot = r.lengthByFoot;
+                lastDistBike = r.lengthByBike;
+                lastTimeFoot = r.timeByFoot;
+                lastTimeBike = r.timeByBike;
+                lastCity = r.city;
             }
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
@@ -199,16 +208,16 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
         List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
                 .map(p -> p.first)
                 .collect(Collectors.toList());
-        Route ret = new DirectionsRoute(-1,
+        Route ret = new com.sonpm_cloud.explorea.data_classes.DirectionsRoute(-1,
                 lll,
                 U.getCurrentMillis(),
-                lll,
+                lastPoly.getPoints(),
                 0f,
-                (int) lastDist,
-                (int) lastDist,
-                (int) lastDist/5*60,
-                (int) lastDist/20*60,
-                "");
+                lastDistFoot,
+                lastDistBike,
+                lastTimeFoot,
+                lastTimeBike,
+                lastCity);
         Log.e("sendRoute", ret.toString());
     }
 }

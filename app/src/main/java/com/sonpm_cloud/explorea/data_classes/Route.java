@@ -108,7 +108,7 @@ public class Route {
         return ret.toString();
     }
 
-    protected static String tryEncode(List<LatLng> decoded) {
+    public static String tryEncode(List<LatLng> decoded) {
         if (decoded.size() > 25)
             throw th("Routes cannot contain more than 25 points");
         return PolyUtil.encode(decoded);

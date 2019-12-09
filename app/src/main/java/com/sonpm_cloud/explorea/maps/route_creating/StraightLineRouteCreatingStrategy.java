@@ -1,10 +1,11 @@
 package com.sonpm_cloud.explorea.maps.route_creating;
 
 import android.location.Location;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
+import com.sonpm_cloud.explorea.data_classes.U;
 
 import java.util.Arrays;
 
@@ -13,13 +14,14 @@ public class StraightLineRouteCreatingStrategy extends RouteCreatingStrategy {
     public StraightLineRouteCreatingStrategy(LatLng[] points) { super(points); }
 
     @Override
-    public PolylineRoute createPolylineRoute() {
+    public DirectionsRoute createPolylineRoute() {
         float distance = 0f;
         PolylineOptions options;
+        String city = "?";
         try {
             options = new PolylineOptions().add(points[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
-            return new PolylineRoute(0f, null);
+            return null;
         }
         float[] temp = new float[3];
         for (int i = 1; i < points.length; i++) {
@@ -38,6 +40,17 @@ public class StraightLineRouteCreatingStrategy extends RouteCreatingStrategy {
                 temp
         );
         distance += temp[0];
-        return new PolylineRoute(distance, options);
+        return new DirectionsRoute(
+                -1,
+                Arrays.asList(points),
+                U.getCurrentMillis(),
+                Arrays.asList(points),
+                0f,
+                (int) distance,
+                (int) distance,
+                (int) ((distance / 1000) / 5) * 60,
+                (int) ((distance / 1000) / 20) * 60,
+                city
+        );
     }
 }
