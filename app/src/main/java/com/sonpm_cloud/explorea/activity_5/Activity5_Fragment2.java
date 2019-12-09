@@ -42,6 +42,7 @@ import java8.util.stream.StreamSupport;
 public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
     private Polyline lastPoly;
+    private long lastCalculation;
     private int lastDistFoot;
     private int lastDistBike;
     private int lastTimeFoot;
@@ -140,6 +141,7 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
             if (r != null) {
                 PolylineOptions pOpt = new PolylineOptions().addAll(PolyUtil.decode(r.encodedDirections));
                 lastPoly = googleMap.addPolyline(pOpt);
+                lastCalculation = r.queryTime;
                 lastDistFoot = r.lengthByFoot;
                 lastDistBike = r.lengthByBike;
                 lastTimeFoot = r.timeByFoot;
@@ -208,9 +210,9 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
         List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
                 .map(p -> p.first)
                 .collect(Collectors.toList());
-        Route ret = new com.sonpm_cloud.explorea.data_classes.DirectionsRoute(-1,
+        Route ret = new DirectionsRoute(-1,
                 lll,
-                U.getCurrentMillis(),
+                lastCalculation,
                 lastPoly.getPoints(),
                 0f,
                 lastDistFoot,
