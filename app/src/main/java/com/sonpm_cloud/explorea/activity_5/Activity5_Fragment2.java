@@ -210,10 +210,8 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
         List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
                 .map(p -> p.first)
                 .collect(Collectors.toList());
-        Route ret = new DirectionsRoute(-1,
+        Route ret = new Route(-1,
                 lll,
-                lastCalculation,
-                lastPoly.getPoints(),
                 0f,
                 lastDistFoot,
                 lastDistBike,
