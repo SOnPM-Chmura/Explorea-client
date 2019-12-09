@@ -1,10 +1,13 @@
 package com.sonpm_cloud.explorea.A5_CreateRoad;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +15,10 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -19,20 +26,42 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sonpm_cloud.explorea.AbstractGoogleMapContainerFragment;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
+import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
+import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.data_classes.U;
+import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
+import com.sonpm_cloud.explorea.maps.route_creating.RouteCreatingStrategy;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragment {
+
+    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private String url = "https://explorea-server.azurewebsites.net";
+    private RequestQueue requestQueue;
+
+    private Polyline lastPoly;
+    private long lastCalculation;
+    private int lastDistFoot;
+    private int lastDistBike;
+    private int lastTimeFoot;
+    private int lastTimeBike;
+    private String lastCity;
 
     private FragmentViewModel viewModel;
 
@@ -74,6 +103,8 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(recyclerAdapter);
+        requestQueue =  Volley.newRequestQueue(Objects.requireNonNull(getActivity()));
+        requireView().findViewById(R.id.buttonCheck).setOnClickListener(this::sendRoute);
     }
 
     @Override
@@ -113,11 +144,31 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
         viewModel.getPoints().observe(this, _points -> {
 
-            List<LatLng> temp;
-            List<LatLng> toRemove = temp = new LinkedList<>(markers.values());
+            if (lastPoly != null) {
+                lastPoly.remove();
+            }
+            DirectionsRoute r = RouteCreatingStrategy.getRecomendedStrategy(
+                    StreamSupport.stream(viewModel.getListPoints())
+                            .map(p -> p.first)
+                            .toArray(LatLng[]::new)
+            )
+                    .createPolylineRoute();
+            if (r != null) {
+                PolylineOptions pOpt = new PolylineOptions().addAll(PolyUtil.decode(r.encodedDirections));
+                lastPoly = googleMap.addPolyline(pOpt);
+                lastCalculation = r.queryTime;
+                lastDistFoot = r.lengthByFoot;
+                lastDistBike = r.lengthByBike;
+                lastTimeFoot = r.timeByFoot;
+                lastTimeBike = r.timeByBike;
+                lastCity = r.city;
+            }
+
+            List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
                     .collect(Collectors.toList());
 
+            List<LatLng> temp = new LinkedList<>(toRemove);
 
             toRemove.removeAll(toAdd);
             toAdd.removeAll(temp);
@@ -167,7 +218,55 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                         CameraPosition.fromLatLngZoom(markers[0], getDefZoom())));
             }
-
         }
+    }
+
+    private void sendRoute(View view) {
+        List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
+                .map(p -> p.first)
+                .collect(Collectors.toList());
+        Route ret = new Route(-1,
+                lll,
+                0f,
+                lastDistFoot,
+                lastDistBike,
+                lastTimeFoot,
+                lastTimeBike,
+                lastCity);
+        Log.e("sendRoute", ret.toString());
+
+        // po dodaniu wyjście na ekran główny -> brak
+        Context context = getActivity();
+        Map<String, String> params = new HashMap<>();
+        params.put("codedRoute", String.valueOf(ret.decodedRoute()));
+        params.put("lengthByFoot", String.valueOf(ret.lengthByFoot));
+        params.put("lengthByBike", String.valueOf(ret.lengthByBike));
+        params.put("timeByFoot", String.valueOf(ret.timeByFoot));
+        params.put("timeByBike", String.valueOf(ret.timeByBike));
+        params.put("city",ret.city);
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(
+                Request.Method.POST,
+                url + "/routes",
+                new JSONObject(params),
+                response -> {
+//                    Log.d(" RESPONSE JSONPost", response.toString());
+                    Log.d(" RESPONSE JSONPost", "DODANO TRASE ?");
+                },
+                error -> {
+                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                            .show();
+                    Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
+                    Log.w(TAG, "request response:failed msg=" + error.getMessage());
+                }
+        ) {
+            /** Passing some request headers* */
+            @Override
+            public Map getHeaders() {
+                HashMap headers = new HashMap();
+                headers.put("authorization", "Bearer " +  LoginActivity.account.getIdToken());
+                return headers;
+            }
+        };
+        requestQueue.add(jsonObjReq);
     }
 }

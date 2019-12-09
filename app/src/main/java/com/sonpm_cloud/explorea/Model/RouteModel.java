@@ -1,6 +1,6 @@
 package com.sonpm_cloud.explorea.Model;
 
-public class Route {
+public class RouteModel {
 
 
     private int id;
@@ -12,7 +12,7 @@ public class Route {
     private int timeByBike;
     private String city;
 
-    public Route(int id, String codedRoute, double avgRating, int lengthByFoot, int lengthByBike, int timeByFoot, int timeByBike, String city) {
+    public RouteModel(int id, String codedRoute, double avgRating, int lengthByFoot, int lengthByBike, int timeByFoot, int timeByBike, String city) {
         this.id = id;
         this.codedRoute = codedRoute;
         this.avgRating = avgRating;

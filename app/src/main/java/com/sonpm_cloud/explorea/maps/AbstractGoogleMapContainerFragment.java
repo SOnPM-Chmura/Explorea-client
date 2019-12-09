@@ -1,4 +1,4 @@
-package com.sonpm_cloud.explorea;
+package com.sonpm_cloud.explorea.maps;
 
 import android.Manifest;
 import android.content.Context;
@@ -27,7 +27,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public abstract class AbstractGoogleMapContainerFragment extends Fragment implements OnMapReadyCallback,
+public abstract class AbstractGoogleMapContainerFragment
+        extends Fragment
+        implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int REQUEST_LOCATION = 420;

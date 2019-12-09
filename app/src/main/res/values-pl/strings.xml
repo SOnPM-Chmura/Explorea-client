@@ -5,6 +5,8 @@
     <string name="logout_button">Wyloguj</string>
     <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
     <string name="request_error_response_msg">Błąd w trakcie łączenia z serwerem</string>
+    <string name="empty_creaded_route_msg">Nie utworzyłeś żadnych tras</string>
+    <string name="empty_favorite_route_msg">Nie masz żadnych ulubionych tras</string>
     <string name="search_track">Wyszukiwanie tras</string>
     <string name="create_track">Stwórz trase</string>
     <string name="mine_tracks">Moje trasy</string>
@@ -24,4 +26,5 @@
     <string name="order_points">Wybierz kolejność</string>
     <string name="routes_found">Znalezione trasy</string>
     <string name="welcome_to_explorea">Witaj w Explorea</string>
+    <string name="rate">Oceń</string>
 </resources>

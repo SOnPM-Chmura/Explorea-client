@@ -20,7 +20,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.sonpm_cloud.explorea.Model.Route;
+import com.sonpm_cloud.explorea.Model.RouteModel;
 import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
 
@@ -79,7 +79,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
         System.out.println(chosenTime);
 
         Button buttonSearch = findViewById(R.id.buttonSearch);
-        buttonSearch.setOnClickListener(v -> sendRequest());
+        buttonSearch.setOnClickListener(v -> sendGetFilteredRoutes());
 
     }
 
@@ -105,18 +105,19 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    private void sendRequest() {
+    private void sendGetFilteredRoutes() {
         chosenCity = String.valueOf(cityText.getText());
 
         if (chosenCity.equals("")) {
             Toast.makeText(this, "Podaj miasto", Toast.LENGTH_LONG).show();
         } else {
+            Log.d("LOG", chosenCity + " " + chosenTime + " " + chosenTransport);
 
             linearLayoutForRoads.removeAllViews();
             Context context = this;
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                     Request.Method.GET,
-                    url + "/routes?city=" +chosenCity + "&time=" + chosenTime + "&transport=" + chosenTransport,
+                    url + "/routes?cityname=" + chosenCity + "&time=" + chosenTime + "&transport=" + chosenTransport,
                     null,
                     response -> {
                         try {
@@ -133,7 +134,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
                                     timeByBike = jsonObject.getInt("timeByBike");
                                     city = (jsonObject.getString("city") != null) ? jsonObject.getString("city"): "";
 
-                                    Route route = new Route(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
+                                    RouteModel route = new RouteModel(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
     //                                routes.add(new Route(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city));
                                     Button btnShow = new Button(this);
                                     String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";

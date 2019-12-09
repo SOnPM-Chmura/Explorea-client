@@ -32,8 +32,8 @@ public class CreateRoadActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         if (tabLayout != null) {
             fragment1 = FragmentActivityMarkingPoints.newInstance();
             fragment2 = FragmentActivityPointsList.newInstance();
@@ -44,6 +44,12 @@ public class CreateRoadActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
             viewPager.setOffscreenPageLimit(adapter.fragments.size());
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 
     @Override
