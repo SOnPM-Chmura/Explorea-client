@@ -229,5 +229,8 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                 lastTimeBike,
                 lastCity);
         Log.e("sendRoute", ret.toString());
+        Intent intent = new Intent(requireContext(), Activity4_test.class);
+        intent.putExtra("ROUTE", ret);
+        startActivity(intent);
     }
 }
