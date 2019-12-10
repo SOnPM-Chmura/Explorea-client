@@ -27,7 +27,7 @@ import com.google.maps.android.PolyUtil;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.data_classes.U;
-import com.sonpm_cloud.explorea.maps.route_creating.RouteCreatingStrategy;
+import com.sonpm_cloud.explorea.maps.route_creating.DirectionsCreatingStrategy;
 
 import java.util.List;
 
@@ -134,8 +134,8 @@ public class Activity4_MapFragment
 
         @Override
         protected Pair<Pair<PolylineOptions, PolylineOptions>, LatLngBounds> doInBackground(LatLng... latLngs) {
-            DirectionsRoute r = RouteCreatingStrategy
-                    .getRecomendedStrategy(latLngs)
+            DirectionsRoute r = DirectionsCreatingStrategy
+                    .getRecommendedStrategy(latLngs, fragment.requireContext())
                     .createDirectionsRoute();
             LatLngBounds.Builder bounds = LatLngBounds.builder();
             fragment.directionsRoute = r;

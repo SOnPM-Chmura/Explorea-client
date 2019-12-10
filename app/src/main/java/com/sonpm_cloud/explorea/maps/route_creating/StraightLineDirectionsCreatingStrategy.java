@@ -10,9 +10,9 @@ import com.sonpm_cloud.explorea.data_classes.U;
 
 import java.util.Arrays;
 
-public class StraightLineRouteCreatingStrategy extends RouteCreatingStrategy {
+public class StraightLineDirectionsCreatingStrategy extends DirectionsCreatingStrategy {
 
-    public StraightLineRouteCreatingStrategy(LatLng[] points, Context context) {
+    public StraightLineDirectionsCreatingStrategy(LatLng[] points, Context context) {
         super(points, context);
     }
 

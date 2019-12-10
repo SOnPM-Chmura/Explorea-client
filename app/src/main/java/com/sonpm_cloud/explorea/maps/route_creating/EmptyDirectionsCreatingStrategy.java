@@ -5,9 +5,9 @@ import android.content.Context;
 import com.google.android.gms.maps.model.LatLng;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 
-public class EmptyRouteCreatingStrategy extends RouteCreatingStrategy {
+public class EmptyDirectionsCreatingStrategy extends DirectionsCreatingStrategy {
 
-    EmptyRouteCreatingStrategy(LatLng[] points, Context context) {
+    EmptyDirectionsCreatingStrategy(LatLng[] points, Context context) {
         super(points, context);
     }
 

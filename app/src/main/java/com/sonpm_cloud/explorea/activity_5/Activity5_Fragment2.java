@@ -31,7 +31,7 @@ import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
 import com.sonpm_cloud.explorea.data_classes.U;
-import com.sonpm_cloud.explorea.maps.route_creating.RouteCreatingStrategy;
+import com.sonpm_cloud.explorea.maps.route_creating.DirectionsCreatingStrategy;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -138,10 +138,10 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
             if (lastPolyBike != null) {
                 lastPolyBike.remove();
             }
-            DirectionsRoute r = RouteCreatingStrategy.getRecomendedStrategy(
+            DirectionsRoute r = DirectionsCreatingStrategy.getRecommendedStrategy(
                     StreamSupport.stream(viewModel.getListPoints())
                             .map(p -> p.first)
-                            .toArray(LatLng[]::new)
+                            .toArray(LatLng[]::new), requireContext()
             )
                     .createDirectionsRoute();
             if (r != null) {

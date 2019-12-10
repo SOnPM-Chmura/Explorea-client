@@ -4,12 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class CachedRoutesDbHelper extends SQLiteOpenHelper {
+public class CachedDirectionsDbHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 2;
-    public static final String DB_NAME = "CachedRoutes.db";
+    public static final int DB_VERSION = 3;
+    public static final String DB_NAME = "CachedDirections.db";
 
-    public CachedRoutesDbHelper(Context context) {
+    public CachedDirectionsDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -36,7 +36,7 @@ public class CachedRoutesDbHelper extends SQLiteOpenHelper {
     }
 
     public interface Structure {
-        String NAME = "CachedRoutes";
+        String NAME = "CachedDirections";
 
         interface COLUMNS {
             String ENCODED_ROUTE = "EncodedRoute";
