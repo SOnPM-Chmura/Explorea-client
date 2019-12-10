@@ -1,5 +1,6 @@
 package com.sonpm_cloud.explorea.maps.route_creating;
 
+import android.content.Context;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -11,7 +12,9 @@ import java.util.Arrays;
 
 public class StraightLineRouteCreatingStrategy extends RouteCreatingStrategy {
 
-    public StraightLineRouteCreatingStrategy(LatLng[] points) { super(points); }
+    public StraightLineRouteCreatingStrategy(LatLng[] points, Context context) {
+        super(points, context);
+    }
 
     @Override
     public DirectionsRoute createDirectionsRoute() {

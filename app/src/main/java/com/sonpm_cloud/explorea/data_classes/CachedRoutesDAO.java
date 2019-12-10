@@ -4,6 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import androidx.annotation.Nullable;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Arrays;
+
 public class CachedRoutesDAO {
 
     private CachedRoutesDbHelper dbHelper;
@@ -11,8 +17,8 @@ public class CachedRoutesDAO {
     public CachedRoutesDAO(Context context) { dbHelper = new CachedRoutesDbHelper(context); }
 
     public void insertCR(final Route route,
-                         final String directionsRouteByFoot,
-                         final String directionsRouteByBike) {
+                         final String encodedDirectionsByFoot,
+                         final String encodedDirectionsByBike) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_ROUTE,
@@ -20,9 +26,9 @@ public class CachedRoutesDAO {
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.CACHING_TIME,
                 U.getCurrentMillis());
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_FOOT,
-                directionsRouteByFoot);
+                encodedDirectionsByFoot);
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_BIKE,
-                directionsRouteByBike);
+                encodedDirectionsByBike);
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.LENGTH_BY_FOOT,
                 route.lengthByFoot);
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.LENGTH_BY_BIKE,
@@ -36,12 +42,23 @@ public class CachedRoutesDAO {
                 null, contentValues);
     }
 
-    public void removeCR(final Route route) {
-        dbHelper.getWritableDatabase().delete(CachedRoutesDbHelper.Structure.NAME,
-                CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_ROUTE + " = ?",
-                new String[]{ route.encodedRoute });
+    public void insertCR(final DirectionsRoute directionsRoute) {
+        insertCR(directionsRoute,
+                directionsRoute.encodedDirectionsByFoot,
+                directionsRoute.encodedDirectionsByBike);
     }
 
+    public void removeCR(final Route route) {
+        removeCR(route.encodedRoute);
+    }
+
+    public void removeCR(final String encodedRoute) {
+        dbHelper.getWritableDatabase().delete(CachedRoutesDbHelper.Structure.NAME,
+                CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_ROUTE + " = ?",
+                new String[]{ encodedRoute });
+    }
+
+    @Nullable
     public DirectionsRoute getCRorNull(final Route route) {
         Cursor cursor = dbHelper.getReadableDatabase().query(
                 CachedRoutesDbHelper.Structure.NAME,
@@ -70,6 +87,44 @@ public class CachedRoutesDAO {
                 directionsRoute.timeByFoot,
                 directionsRoute.timeByBike,
                 route.city
+        );
+    }
+
+    @Nullable
+    public DirectionsRoute getCRorNull(final LatLng[] points) {
+        String encodedRoute;
+        try {
+            encodedRoute = Route.tryEncode(Arrays.asList(points));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+        Cursor cursor = dbHelper.getReadableDatabase().query(
+                CachedRoutesDbHelper.Structure.NAME,
+                null,
+                CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_ROUTE + " = ?",
+                new String[]{ encodedRoute },
+                null,
+                null,
+                CachedRoutesDbHelper.Structure.COLUMNS.CACHING_TIME + " DESC");
+
+        DirectionsRoute directionsRoute = mapCursor(cursor);
+        if(U.hasHourPassed(directionsRoute.queryTime)) {
+            removeCR(encodedRoute);
+            return null;
+        }
+        cursor.close();
+        return new DirectionsRoute(
+                directionsRoute.id,
+                encodedRoute,
+                directionsRoute.queryTime,
+                directionsRoute.encodedDirectionsByFoot,
+                directionsRoute.encodedDirectionsByBike,
+                directionsRoute.avgRating,
+                directionsRoute.lengthByFoot,
+                directionsRoute.lengthByBike,
+                directionsRoute.timeByFoot,
+                directionsRoute.timeByBike,
+                directionsRoute.city
         );
     }
 

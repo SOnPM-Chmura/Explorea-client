@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,16 +18,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <meta-data android:name="com.google.android.geo.API_KEY"
+        <activity android:name=".Activity4_test"></activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBZhqK7gfpGG6nM0ryiG5K1UwV1fRfTcZc" />
-        <meta-data android:name="com.sonpm_cloud.explorea.api.WEB_ID"
+        <meta-data
+            android:name="com.sonpm_cloud.explorea.api.WEB_ID"
             android:value="685250076671-v2uk6ii19acgok6n2fa8jmog7uqsfamq.apps.googleusercontent.com" />
-        <activity android:name=".LoginActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity_5.Activity5"
+
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity_5.Activity5"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
