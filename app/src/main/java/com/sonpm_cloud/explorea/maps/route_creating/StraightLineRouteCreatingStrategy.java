@@ -14,7 +14,7 @@ public class StraightLineRouteCreatingStrategy extends RouteCreatingStrategy {
     public StraightLineRouteCreatingStrategy(LatLng[] points) { super(points); }
 
     @Override
-    public DirectionsRoute createPolylineRoute() {
+    public DirectionsRoute createDirectionsRoute() {
         float distance = 0f;
         PolylineOptions options;
         String city = "?";
@@ -44,6 +44,7 @@ public class StraightLineRouteCreatingStrategy extends RouteCreatingStrategy {
                 -1,
                 Arrays.asList(points),
                 U.getCurrentMillis(),
+                Arrays.asList(points),
                 Arrays.asList(points),
                 0f,
                 (int) distance,

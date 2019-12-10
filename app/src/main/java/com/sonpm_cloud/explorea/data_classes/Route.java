@@ -7,9 +7,10 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.PolyUtil;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Route {
+public class Route implements Serializable {
 
     public final long id;
     public final String encodedRoute;

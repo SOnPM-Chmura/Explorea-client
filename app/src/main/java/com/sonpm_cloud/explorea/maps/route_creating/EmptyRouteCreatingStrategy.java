@@ -8,5 +8,5 @@ public class EmptyRouteCreatingStrategy extends RouteCreatingStrategy {
     EmptyRouteCreatingStrategy(LatLng[] points) { super(points); }
 
     @Override
-    public DirectionsRoute createPolylineRoute() { return null; }
+    public DirectionsRoute createDirectionsRoute() { return null; }
 }

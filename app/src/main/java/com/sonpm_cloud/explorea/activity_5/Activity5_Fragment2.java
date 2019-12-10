@@ -1,5 +1,6 @@
 package com.sonpm_cloud.explorea.activity_5;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.sonpm_cloud.explorea.Activity4_test;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
@@ -41,7 +43,8 @@ import java8.util.stream.StreamSupport;
 
 public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
-    private Polyline lastPoly;
+    private Polyline lastPolyFoot;
+    private Polyline lastPolyBike;
     private long lastCalculation;
     private int lastDistFoot;
     private int lastDistBike;
@@ -129,18 +132,25 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
         viewModel.getPoints().observe(this, _points -> {
 
-            if (lastPoly != null) {
-                lastPoly.remove();
+            if (lastPolyFoot != null) {
+                lastPolyFoot.remove();
+            }
+            if (lastPolyBike != null) {
+                lastPolyBike.remove();
             }
             DirectionsRoute r = RouteCreatingStrategy.getRecomendedStrategy(
                     StreamSupport.stream(viewModel.getListPoints())
                             .map(p -> p.first)
                             .toArray(LatLng[]::new)
             )
-                    .createPolylineRoute();
+                    .createDirectionsRoute();
             if (r != null) {
-                PolylineOptions pOpt = new PolylineOptions().addAll(PolyUtil.decode(r.encodedDirections));
-                lastPoly = googleMap.addPolyline(pOpt);
+                PolylineOptions pOptf = new PolylineOptions()
+                        .addAll(PolyUtil.decode(r.encodedDirectionsByFoot)).color(R.color.routeFoot);
+                PolylineOptions pOptb = new PolylineOptions()
+                        .addAll(PolyUtil.decode(r.encodedDirectionsByBike)).color(R.color.routeBike);
+                lastPolyFoot = googleMap.addPolyline(pOptf);
+                lastPolyBike = googleMap.addPolyline(pOptb);
                 lastCalculation = r.queryTime;
                 lastDistFoot = r.lengthByFoot;
                 lastDistBike = r.lengthByBike;

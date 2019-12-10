@@ -10,15 +10,19 @@ public class CachedRoutesDAO {
 
     public CachedRoutesDAO(Context context) { dbHelper = new CachedRoutesDbHelper(context); }
 
-    public void insertCR(final Route route, final String directionsRoute) {
+    public void insertCR(final Route route,
+                         final String directionsRouteByFoot,
+                         final String directionsRouteByBike) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_ROUTE,
                 route.encodedRoute);
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.CACHING_TIME,
                 U.getCurrentMillis());
-        contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS,
-                directionsRoute);
+        contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_FOOT,
+                directionsRouteByFoot);
+        contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_BIKE,
+                directionsRouteByBike);
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.LENGTH_BY_FOOT,
                 route.lengthByFoot);
         contentValues.put(CachedRoutesDbHelper.Structure.COLUMNS.LENGTH_BY_BIKE,
@@ -58,7 +62,8 @@ public class CachedRoutesDAO {
                 route.id,
                 route.encodedRoute,
                 directionsRoute.queryTime,
-                directionsRoute.encodedDirections,
+                directionsRoute.encodedDirectionsByFoot,
+                directionsRoute.encodedDirectionsByBike,
                 route.avgRating,
                 directionsRoute.lengthByFoot,
                 directionsRoute.lengthByBike,
@@ -73,7 +78,8 @@ public class CachedRoutesDAO {
     private DirectionsRoute mapCursor(final Cursor cursor) {
         int ID_ER = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_ROUTE);
         int ID_CT = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.CACHING_TIME);
-        int ID_ED = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS);
+        int ID_EDF = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_FOOT);
+        int ID_EDB = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_BIKE);
         int ID_LBF = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.LENGTH_BY_FOOT);
         int ID_LBB = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.LENGTH_BY_BIKE);
         int ID_TBF = cursor.getColumnIndex(CachedRoutesDbHelper.Structure.COLUMNS.TIME_BY_FOOT);
@@ -81,12 +87,13 @@ public class CachedRoutesDAO {
 
         String ER = cursor.getString(ID_ER);
         long CT = cursor.getLong(ID_CT);
-        String ED = cursor.getString(ID_ED);
+        String EDF = cursor.getString(ID_EDF);
+        String EDB = cursor.getString(ID_EDB);
         int LBF = cursor.getInt(ID_LBF);
         int LBB = cursor.getInt(ID_LBB);
         int TBF = cursor.getInt(ID_TBF);
         int TBB = cursor.getInt(ID_TBB);
 
-        return new DirectionsRoute(-1, ER, CT, ED, 0, LBF, LBB, TBF, TBB, "");
+        return new DirectionsRoute(-1, ER, CT, EDF, EDB, 0, LBF, LBB, TBF, TBB, "");
     }
 }

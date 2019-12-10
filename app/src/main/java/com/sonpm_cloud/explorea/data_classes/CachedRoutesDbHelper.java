@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class CachedRoutesDbHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
     public static final String DB_NAME = "CachedRoutes.db";
 
     public CachedRoutesDbHelper(Context context) {
@@ -19,7 +19,8 @@ public class CachedRoutesDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + Structure.NAME + " ( " +
                         Structure.COLUMNS.ENCODED_ROUTE + " TEXT PRIMARY KEY, " +
                         Structure.COLUMNS.CACHING_TIME + " INTEGER, " +
-                        Structure.COLUMNS.ENCODED_DIRECTIONS + " TEXT, " +
+                        Structure.COLUMNS.ENCODED_DIRECTIONS_FOOT + " TEXT, " +
+                        Structure.COLUMNS.ENCODED_DIRECTIONS_BIKE + " TEXT, " +
                         Structure.COLUMNS.LENGTH_BY_FOOT + " INTEGER, " +
                         Structure.COLUMNS.LENGTH_BY_BIKE + " INTEGER, " +
                         Structure.COLUMNS.TIME_BY_FOOT + " INTEGER, " +
@@ -40,7 +41,8 @@ public class CachedRoutesDbHelper extends SQLiteOpenHelper {
         interface COLUMNS {
             String ENCODED_ROUTE = "EncodedRoute";
             String CACHING_TIME = "CachingTime";
-            String ENCODED_DIRECTIONS = "EncodedDirections";
+            String ENCODED_DIRECTIONS_FOOT = "EncodedDirectionsByFoot";
+            String ENCODED_DIRECTIONS_BIKE = "EncodedDirectionsByBike";
             String LENGTH_BY_FOOT = "LengthByFoot";
             String LENGTH_BY_BIKE = "LengthByBike";
             String TIME_BY_FOOT = "TimeByFoot";

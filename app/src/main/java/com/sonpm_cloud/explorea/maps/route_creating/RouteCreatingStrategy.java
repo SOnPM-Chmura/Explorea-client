@@ -13,7 +13,7 @@ public abstract class RouteCreatingStrategy {
         this.points = points;
     }
 
-    public abstract DirectionsRoute createPolylineRoute();
+    public abstract DirectionsRoute createDirectionsRoute();
 
     public static RouteCreatingStrategy getRecomendedStrategy(LatLng[] points) {
         return new StraightLineRouteCreatingStrategy(points);
