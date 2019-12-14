@@ -14,6 +14,9 @@ public class CachedDirectionsCreatingStrategy extends DirectionsCreatingStrategy
 
     @Override
     public DirectionsRoute createDirectionsRoute() {
-        return new CachedDirectionsDAO(context).getCDRorNull(points);
+        CachedDirectionsDAO cachedDirectionsDAO = new CachedDirectionsDAO(context);
+        DirectionsRoute ret = cachedDirectionsDAO.getCDRorNull(points);
+        cachedDirectionsDAO.finish();
+        return ret;
     }
 }
