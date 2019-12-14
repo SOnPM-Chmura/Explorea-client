@@ -72,6 +72,7 @@ public class DirectionsRoute extends Route {
                 "lengthByBike: " + lengthByBike + ",\n" +
                 "timeByFoot: " + timeByFoot + ",\n" +
                 "timeByBike: " + timeByBike + ",\n" +
-                "city: " + city + "\n}";
+                "city: " + city + ",\n" +
+                "bounds: " + bounds.toString() + "\n}";
     }
 }

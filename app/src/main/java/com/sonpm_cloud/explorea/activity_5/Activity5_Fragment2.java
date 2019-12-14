@@ -137,12 +137,17 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
             if (lastPolyBike != null) {
                 lastPolyBike.remove();
             }
-            DirectionsRoute r = DirectionsCreatingStrategy.getRecommendedStrategy(
-                    StreamSupport.stream(viewModel.getListPoints())
-                            .map(p -> p.first)
-                            .toArray(LatLng[]::new), requireContext()
-            )
-                    .createDirectionsRoute();
+            DirectionsRoute r;
+            if (_points != null && _points.size() > 1) {
+                r = DirectionsCreatingStrategy.getRecommendedStrategy(
+                        StreamSupport.stream(viewModel.getListPoints())
+                                .map(p -> p.first)
+                                .toArray(LatLng[]::new), requireContext()
+                )
+                                              .createDirectionsRoute();
+            } else {
+                r = null;
+            }
             if (r != null) {
                 PolylineOptions pOptf = new PolylineOptions()
                         .addAll(PolyUtil.decode(r.encodedDirectionsByFoot)).color(R.color.routeFoot);
@@ -156,6 +161,9 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                 lastTimeFoot = r.timeByFoot;
                 lastTimeBike = r.timeByBike;
                 lastCity = r.city;
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(r.bounds,
+                                                                         (int) U.dp_px(32, requireContext())));
+                Log.e("dirdirdirdirdir", r.toString());
             }
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());

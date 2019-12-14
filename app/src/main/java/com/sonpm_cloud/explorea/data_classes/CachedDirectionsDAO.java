@@ -18,36 +18,36 @@ public class CachedDirectionsDAO {
 
     public CachedDirectionsDAO(Context context) { dbHelper = new CachedDirectionsDbHelper(context); }
 
-    public void insertCR(final Route route,
-                         final String encodedDirectionsByFoot,
-                         final String encodedDirectionsByBike) {
+    public void insertCR(final DirectionsRoute directionsRoute) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.ENCODED_ROUTE,
-                route.encodedRoute);
+                          directionsRoute.encodedRoute);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.CACHING_TIME,
-                U.getCurrentMillis());
+                          directionsRoute.queryTime);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_FOOT,
-                encodedDirectionsByFoot);
+                          directionsRoute.encodedDirectionsByFoot);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.ENCODED_DIRECTIONS_BIKE,
-                encodedDirectionsByBike);
+                          directionsRoute.encodedDirectionsByBike);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.LENGTH_BY_FOOT,
-                route.lengthByFoot);
+                          directionsRoute.lengthByFoot);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.LENGTH_BY_BIKE,
-                route.lengthByBike);
+                          directionsRoute.lengthByBike);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.TIME_BY_FOOT,
-                route.timeByFoot);
+                          directionsRoute.timeByFoot);
         contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.TIME_BY_BIKE,
-                route.timeByBike);
+                          directionsRoute.timeByBike);
+        contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_NE_LAT,
+                          directionsRoute.bounds.northeast.latitude);
+        contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_NE_LNG,
+                          directionsRoute.bounds.northeast.longitude);
+        contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_SW_LAT,
+                          directionsRoute.bounds.southwest.latitude);
+        contentValues.put(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_SW_LNG,
+                          directionsRoute.bounds.southwest.longitude);
 
         dbHelper.getWritableDatabase().insert(CachedDirectionsDbHelper.Structure.NAME,
-                null, contentValues);
-    }
-
-    public void insertCR(final DirectionsRoute directionsRoute) {
-        insertCR(directionsRoute,
-                directionsRoute.encodedDirectionsByFoot,
-                directionsRoute.encodedDirectionsByBike);
+                                              null, contentValues);
     }
 
     public void removeCR(final Route route) { removeCR(route.encodedRoute); }
@@ -88,6 +88,8 @@ public class CachedDirectionsDAO {
                 null,
                 CachedDirectionsDbHelper.Structure.COLUMNS.CACHING_TIME + " DESC");
 
+        cursor.moveToFirst();
+        if (cursor.getCount() < 1) return null;
         DirectionsRoute directionsRoute = mapCursor(cursor);
         if(U.hasHourPassed(directionsRoute.queryTime)) {
             removeCR(encodedRoute);
@@ -139,6 +141,6 @@ public class CachedDirectionsDAO {
         double BSWLG = cursor.getDouble(ID_BSWLG);
 
         return new DirectionsRoute(-1, ER, CT, EDF, EDB, 0, LBF, LBB, TBF, TBB, "",
-                                   new LatLngBounds(new LatLng(BNELT, BNELG), new LatLng(BSWLT, BSWLG)));
+                                   new LatLngBounds( new LatLng(BSWLT, BSWLG), new LatLng(BNELT, BNELG)));
     }
 }

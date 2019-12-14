@@ -137,20 +137,17 @@ public class Activity4_MapFragment
             DirectionsRoute r = DirectionsCreatingStrategy
                     .getRecommendedStrategy(latLngs, fragment.requireContext())
                     .createDirectionsRoute();
-            LatLngBounds.Builder bounds = LatLngBounds.builder();
             fragment.directionsRoute = r;
             List<LatLng> decodeDirF = PolyUtil.decode(r.encodedDirectionsByFoot);
             List<LatLng> decodeDirB = PolyUtil.decode(r.encodedDirectionsByFoot);
             PolylineOptions polylineOptionsFoot = new PolylineOptions()
                     .addAll(decodeDirF).color(R.color.routeFoot);
-            for (LatLng marker : decodeDirF) bounds.include(marker);
             PolylineOptions polylineOptionsBike = new PolylineOptions()
                     .addAll(decodeDirB).color(R.color.routeBike);
-            for (LatLng marker : decodeDirB) bounds.include(marker);
 
             return Pair.create(
                     Pair.create(polylineOptionsFoot, polylineOptionsBike),
-                            bounds.build());
+                            r.bounds);
         }
 
         @Override
