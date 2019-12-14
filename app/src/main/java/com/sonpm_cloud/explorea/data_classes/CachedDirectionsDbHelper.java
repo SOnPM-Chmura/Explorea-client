@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class CachedDirectionsDbHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 3;
+    public static final int DB_VERSION = 4;
     public static final String DB_NAME = "CachedDirections.db";
 
     public CachedDirectionsDbHelper(Context context) {
@@ -24,7 +24,11 @@ public class CachedDirectionsDbHelper extends SQLiteOpenHelper {
                         Structure.COLUMNS.LENGTH_BY_FOOT + " INTEGER, " +
                         Structure.COLUMNS.LENGTH_BY_BIKE + " INTEGER, " +
                         Structure.COLUMNS.TIME_BY_FOOT + " INTEGER, " +
-                        Structure.COLUMNS.TIME_BY_BIKE + " INTEGER )"
+                        Structure.COLUMNS.TIME_BY_BIKE + " INTEGER," +
+                        Structure.COLUMNS.BOUNDS_NE_LAT + " DOUBLE, " +
+                        Structure.COLUMNS.BOUNDS_NE_LNG + " DOUBLE, " +
+                        Structure.COLUMNS.BOUNDS_SW_LAT + " DOUBLE, " +
+                        Structure.COLUMNS.BOUNDS_SW_LNG + " DOUBLE )"
         );
         init(db);
     }
@@ -47,6 +51,10 @@ public class CachedDirectionsDbHelper extends SQLiteOpenHelper {
             String LENGTH_BY_BIKE = "LengthByBike";
             String TIME_BY_FOOT = "TimeByFoot";
             String TIME_BY_BIKE = "TimeByBike";
+            String BOUNDS_NE_LAT = "BoundsNELat";
+            String BOUNDS_NE_LNG = "BoundsNELng";
+            String BOUNDS_SW_LAT = "BoundsSWLat";
+            String BOUNDS_SW_LNG = "BoundsSWLng";
         }
     }
 

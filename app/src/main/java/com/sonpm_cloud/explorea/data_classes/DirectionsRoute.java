@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class DirectionsRoute extends Route {
     public final String encodedDirectionsByFoot;
     public final String encodedDirectionsByBike;
     public final long queryTime;
+    public final LatLngBounds bounds;
 
     public DirectionsRoute(
             long id,
@@ -25,11 +27,13 @@ public class DirectionsRoute extends Route {
             int lengthByBike,
             int timeByFoot,
             int timeByBike,
-            String city) {
+            String city,
+            LatLngBounds bounds) {
         super(id, encodedRoute, avgRating, lengthByFoot, lengthByBike, timeByFoot, timeByBike, city);
         this.encodedDirectionsByFoot = encodedDirectionsByFoot;
         this.encodedDirectionsByBike = encodedDirectionsByBike;
         this.queryTime = queryTime;
+        this.bounds = bounds;
     }
 
     public DirectionsRoute(
@@ -43,11 +47,13 @@ public class DirectionsRoute extends Route {
             int lengthByBike,
             int timeByFoot,
             int timeByBike,
-            String city) {
+            String city,
+            LatLngBounds bounds) {
         super(id, encodedRoute, avgRating, lengthByFoot, lengthByBike, timeByFoot, timeByBike, city);
         this.encodedDirectionsByFoot = tryEncode(encodedDirectionsByFoot);
         this.encodedDirectionsByBike = tryEncode(encodedDirectionsByBike);
         this.queryTime = queryTime;
+        this.bounds = bounds;
     }
 
     @SuppressLint("DefaultLocale")

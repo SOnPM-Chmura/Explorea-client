@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.Arrays;
 
@@ -48,9 +50,7 @@ public class CachedDirectionsDAO {
                 directionsRoute.encodedDirectionsByBike);
     }
 
-    public void removeCR(final Route route) {
-        removeCR(route.encodedRoute);
-    }
+    public void removeCR(final Route route) { removeCR(route.encodedRoute); }
 
     public void removeCR(final String encodedRoute) {
         dbHelper.getWritableDatabase().delete(CachedDirectionsDbHelper.Structure.NAME,
@@ -60,34 +60,7 @@ public class CachedDirectionsDAO {
 
     @Nullable
     public DirectionsRoute getCDRorNull(final Route route) {
-        Cursor cursor = dbHelper.getReadableDatabase().query(
-                CachedDirectionsDbHelper.Structure.NAME,
-                null,
-                CachedDirectionsDbHelper.Structure.COLUMNS.ENCODED_ROUTE + " = ?",
-                new String[]{ route.encodedRoute },
-                null,
-                null,
-                CachedDirectionsDbHelper.Structure.COLUMNS.CACHING_TIME + " DESC");
-
-        DirectionsRoute directionsRoute = mapCursor(cursor);
-        if(U.hasHourPassed(directionsRoute.queryTime)) {
-            removeCR(route);
-            return null;
-        }
-        cursor.close();
-        return new DirectionsRoute(
-                route.id,
-                route.encodedRoute,
-                directionsRoute.queryTime,
-                directionsRoute.encodedDirectionsByFoot,
-                directionsRoute.encodedDirectionsByBike,
-                route.avgRating,
-                directionsRoute.lengthByFoot,
-                directionsRoute.lengthByBike,
-                directionsRoute.timeByFoot,
-                directionsRoute.timeByBike,
-                route.city
-        );
+        return getCDRorNull(route.encodedRoute, route.id, route.avgRating, route.city);
     }
 
     @Nullable
@@ -98,6 +71,14 @@ public class CachedDirectionsDAO {
         } catch (IllegalArgumentException ignored) {
             return null;
         }
+        return getCDRorNull(encodedRoute, null, null, null);
+    }
+
+    private DirectionsRoute getCDRorNull(@NonNull final String encodedRoute,
+                                         @Nullable Long id,
+                                         @Nullable Float avgRating,
+                                         @Nullable String city) {
+
         Cursor cursor = dbHelper.getReadableDatabase().query(
                 CachedDirectionsDbHelper.Structure.NAME,
                 null,
@@ -114,18 +95,18 @@ public class CachedDirectionsDAO {
         }
         cursor.close();
         return new DirectionsRoute(
-                directionsRoute.id,
+                id == null ? directionsRoute.id : id,
                 encodedRoute,
                 directionsRoute.queryTime,
                 directionsRoute.encodedDirectionsByFoot,
                 directionsRoute.encodedDirectionsByBike,
-                directionsRoute.avgRating,
+                avgRating == null ? directionsRoute.avgRating : avgRating,
                 directionsRoute.lengthByFoot,
                 directionsRoute.lengthByBike,
                 directionsRoute.timeByFoot,
                 directionsRoute.timeByBike,
-                directionsRoute.city
-        );
+                city == null ? directionsRoute.city : city,
+                directionsRoute.bounds);
     }
 
     public void finish() { dbHelper.close(); }
@@ -139,6 +120,10 @@ public class CachedDirectionsDAO {
         int ID_LBB = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.LENGTH_BY_BIKE);
         int ID_TBF = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.TIME_BY_FOOT);
         int ID_TBB = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.TIME_BY_BIKE);
+        int ID_BNELT = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_NE_LAT);
+        int ID_BNELG = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_NE_LNG);
+        int ID_BSWLT = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_SW_LAT);
+        int ID_BSWLG = cursor.getColumnIndex(CachedDirectionsDbHelper.Structure.COLUMNS.BOUNDS_SW_LNG);
 
         String ER = cursor.getString(ID_ER);
         long CT = cursor.getLong(ID_CT);
@@ -148,7 +133,12 @@ public class CachedDirectionsDAO {
         int LBB = cursor.getInt(ID_LBB);
         int TBF = cursor.getInt(ID_TBF);
         int TBB = cursor.getInt(ID_TBB);
+        double BNELT = cursor.getDouble(ID_BNELT);
+        double BNELG = cursor.getDouble(ID_BNELG);
+        double BSWLT = cursor.getDouble(ID_BSWLT);
+        double BSWLG = cursor.getDouble(ID_BSWLG);
 
-        return new DirectionsRoute(-1, ER, CT, EDF, EDB, 0, LBF, LBB, TBF, TBB, "");
+        return new DirectionsRoute(-1, ER, CT, EDF, EDB, 0, LBF, LBB, TBF, TBB, "",
+                                   new LatLngBounds(new LatLng(BNELT, BNELG), new LatLng(BSWLT, BSWLG)));
     }
 }

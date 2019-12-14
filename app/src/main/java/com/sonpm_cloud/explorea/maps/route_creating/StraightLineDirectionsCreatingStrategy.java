@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.U;
@@ -21,11 +22,13 @@ public class StraightLineDirectionsCreatingStrategy extends DirectionsCreatingSt
         float distance = 0f;
         PolylineOptions options;
         String city = "?";
+        LatLngBounds.Builder bounds = new LatLngBounds.Builder();
         try {
             options = new PolylineOptions().add(points[0]);
         } catch (ArrayIndexOutOfBoundsException e) {
             return null;
         }
+        bounds.include(points[0]);
         float[] temp = new float[3];
         for (int i = 1; i < points.length; i++) {
             options.add(points[i]);
@@ -35,6 +38,7 @@ public class StraightLineDirectionsCreatingStrategy extends DirectionsCreatingSt
                     temp
             );
             distance += temp[0];
+            bounds.include(points[i]);
         }
         options.add(points[0]);
         Location.distanceBetween(
@@ -54,7 +58,7 @@ public class StraightLineDirectionsCreatingStrategy extends DirectionsCreatingSt
                 (int) distance,
                 (int) ((distance / 1000) / 5) * 60,
                 (int) ((distance / 1000) / 20) * 60,
-                city
-        );
+                city,
+                bounds.build());
     }
 }

@@ -24,7 +24,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
-import com.sonpm_cloud.explorea.Activity4_test;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
@@ -228,9 +227,5 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                 lastTimeFoot,
                 lastTimeBike,
                 lastCity);
-        Log.e("sendRoute", ret.toString());
-        Intent intent = new Intent(requireContext(), Activity4_test.class);
-        intent.putExtra("ROUTE", ret);
-        startActivity(intent);
     }
 }
