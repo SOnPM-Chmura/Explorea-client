@@ -8,4 +8,5 @@
     <string name="add_route">Dodaj trasę</string>
     <string name="select_points">Wybierz punkty</string>
     <string name="order_points">Wybierz kolejność</string>
+    <string name="directions_null">Nie udało się wyznaczyć trasy dla tych punktów</string>
 </resources>

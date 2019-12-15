@@ -1,12 +1,12 @@
 package com.sonpm_cloud.explorea.activity_5;
 
-import android.content.Intent;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,12 +44,38 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
     private Polyline lastPolyFoot;
     private Polyline lastPolyBike;
+
     private long lastCalculation;
     private int lastDistFoot;
     private int lastDistBike;
     private int lastTimeFoot;
     private int lastTimeBike;
     private String lastCity;
+
+    private synchronized void changeParameters(DirectionsRoute route) {
+        if (googleMap == null) return;
+        if (lastCalculation > route.queryTime) return;
+        if (lastPolyFoot != null) {
+            lastPolyFoot.remove();
+        }
+        if (lastPolyBike != null) {
+            lastPolyBike.remove();
+        }
+        PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
+                                                       .color(R.color.routeFoot);
+        PolylineOptions newBike = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByBike))
+                                                       .color(R.color.routeBike);
+        lastPolyFoot = googleMap.addPolyline(newFoot);
+        lastPolyBike = googleMap.addPolyline(newBike);
+        lastCalculation = route.queryTime;
+        lastDistFoot = route.lengthByFoot;
+        lastDistBike = route.lengthByBike;
+        lastTimeFoot = route.timeByFoot;
+        lastTimeBike = route.timeByBike;
+        lastCity = route.city;
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(route.bounds,
+                                                                 (int) U.dp_px(32, requireContext())));
+    }
 
     private Activity5_Fragment_ViewModel viewModel;
 
@@ -131,40 +157,10 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
 
         viewModel.getPoints().observe(this, _points -> {
 
-            if (lastPolyFoot != null) {
-                lastPolyFoot.remove();
-            }
-            if (lastPolyBike != null) {
-                lastPolyBike.remove();
-            }
-            DirectionsRoute r;
-            if (_points != null && _points.size() > 1) {
-                r = DirectionsCreatingStrategy.getRecommendedStrategy(
-                        StreamSupport.stream(viewModel.getListPoints())
-                                .map(p -> p.first)
-                                .toArray(LatLng[]::new), requireContext()
-                )
-                                              .createDirectionsRoute();
-            } else {
-                r = null;
-            }
-            if (r != null) {
-                PolylineOptions pOptf = new PolylineOptions()
-                        .addAll(PolyUtil.decode(r.encodedDirectionsByFoot)).color(R.color.routeFoot);
-                PolylineOptions pOptb = new PolylineOptions()
-                        .addAll(PolyUtil.decode(r.encodedDirectionsByBike)).color(R.color.routeBike);
-                lastPolyFoot = googleMap.addPolyline(pOptf);
-                lastPolyBike = googleMap.addPolyline(pOptb);
-                lastCalculation = r.queryTime;
-                lastDistFoot = r.lengthByFoot;
-                lastDistBike = r.lengthByBike;
-                lastTimeFoot = r.timeByFoot;
-                lastTimeBike = r.timeByBike;
-                lastCity = r.city;
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(r.bounds,
-                                                                         (int) U.dp_px(32, requireContext())));
-                Log.e("dirdirdirdirdir", r.toString());
-            }
+            if (_points.size() > 1 && _points.size() < 25)
+                new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
+                                                                                        .map(p -> p.first)
+                                                                                        .toArray(LatLng[]::new));
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
@@ -235,5 +231,35 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                 lastTimeFoot,
                 lastTimeBike,
                 lastCity);
+    }
+
+    private static class DirectionsGetTask
+            extends AsyncTask<LatLng, Void, DirectionsRoute> {
+
+        Activity5_Fragment2 fragment;
+
+        DirectionsGetTask(Activity5_Fragment2 fragment) {
+            this.fragment = fragment;
+        }
+
+        @Override
+        protected DirectionsRoute doInBackground(LatLng... latLngs) {
+
+            return DirectionsCreatingStrategy
+                    .getRecommendedStrategy(latLngs, fragment.requireContext())
+                    .createDirectionsRoute();
+        }
+
+        @Override
+        protected void onPostExecute(DirectionsRoute result) {
+
+            if (result == null) {
+                Toast.makeText(fragment.requireContext(),
+                               fragment.getString(R.string.directions_null),
+                               Toast.LENGTH_LONG).show();
+                return;
+            }
+            fragment.changeParameters(result);
+        }
     }
 }

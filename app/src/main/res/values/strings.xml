@@ -7,5 +7,6 @@
     <string name="add_route">Add route</string>
     <string name="select_points">Select points</string>
     <string name="order_points">Order points</string>
+    <string name="directions_null">Could not create directions for this route</string>
 
 </resources>
