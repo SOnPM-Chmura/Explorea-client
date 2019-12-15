@@ -13,7 +13,7 @@ public class HybridDirectionsCreatingStrategy extends DirectionsCreatingStrategy
     }
 
     private DirectionsCreatingStrategy getPullingStrategy() {
-        return new StraightLineDirectionsCreatingStrategy(points, context);
+        return new APIDirectionsCreatingStrategy(points, context);
     }
 
     @Override
@@ -24,6 +24,7 @@ public class HybridDirectionsCreatingStrategy extends DirectionsCreatingStrategy
         DirectionsRoute ret = cachedDirectionsDAO.getCDRorNull(points);
         if (ret == null) {
             ret = getPullingStrategy().createDirectionsRoute();
+            if (ret == null) return null;
             cachedDirectionsDAO.insertCR(ret);
         }
         cachedDirectionsDAO.finish();

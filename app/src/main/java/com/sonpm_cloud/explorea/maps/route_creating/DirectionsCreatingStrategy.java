@@ -18,6 +18,6 @@ public abstract class DirectionsCreatingStrategy {
     public abstract DirectionsRoute createDirectionsRoute();
 
     public static DirectionsCreatingStrategy getRecommendedStrategy(LatLng[] points, Context context) {
-        return new StraightLineDirectionsCreatingStrategy(points, context);
+        return new HybridDirectionsCreatingStrategy(points, context);
     }
 }

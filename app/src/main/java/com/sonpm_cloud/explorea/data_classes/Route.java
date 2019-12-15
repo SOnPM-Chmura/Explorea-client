@@ -112,6 +112,8 @@ public class Route implements Serializable {
     public static String tryEncode(List<LatLng> decoded) {
         if (decoded.size() > 25)
             throw th("Routes cannot contain more than 25 points");
+        if (decoded.size() < 2)
+            throw th("Routes cannot contain less than 2 points");
         return PolyUtil.encode(decoded);
     }
 

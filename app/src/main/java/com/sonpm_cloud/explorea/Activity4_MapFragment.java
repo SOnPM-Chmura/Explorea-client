@@ -9,11 +9,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
+
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.sonpm_cloud.explorea.data_classes.APIDirectionsDAO;
 import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.data_classes.U;
@@ -78,27 +80,15 @@ public class Activity4_MapFragment
                 false);
     }
 
-    public enum By {
-        Foot, Bike
-    }
-
-    public void launchMap(By what) {
-        String url1 = "https://www.google.pl/maps/dir/";
-        String url2 = "data=!3m1!4b1!4m10!4m9!1m3!2m2!1d20!2d52!1m3!2m2!1d20!2d51!";
-        String url3 = "";
-        if (what == By.Foot) url3 = "3e1";
-        if (what == By.Bike) url3 = "3e2";
-        StringBuilder url = new StringBuilder(url1);
-
-        if (what == By.Foot)
-            for (LatLng coord : PolyUtil.decode(directionsRoute.encodedDirectionsByFoot))
-                url.append(coord.latitude).append(",+").append(coord.longitude).append("/");
-        if (what == By.Bike)
-            for (LatLng coord : PolyUtil.decode(directionsRoute.encodedDirectionsByBike))
-                url.append(coord.latitude).append(",+").append(coord.longitude).append("/");
-        url.append(url2).append(url3);
-        Log.e("Created url", url.toString());
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.toString()));
+    public void launchMap(APIDirectionsDAO.By what) {
+        LatLng[] directions;
+        if (what == APIDirectionsDAO.By.Foot) directions = PolyUtil.decode(directionsRoute.encodedDirectionsByFoot)
+                                                                   .toArray(new LatLng[0]);
+        else if(what == APIDirectionsDAO.By.Bike) directions = PolyUtil.decode(directionsRoute.encodedDirectionsByBike)
+                                                                       .toArray(new LatLng[0]);
+        else return;
+        String url = APIDirectionsDAO.createGoogleNavigationURL(directions, what);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(intent);
     }
 
@@ -152,6 +142,12 @@ public class Activity4_MapFragment
 
         @Override
         protected void onPostExecute(Pair<Pair<PolylineOptions, PolylineOptions>, LatLngBounds> result) {
+            if (result == null) {
+                Toast.makeText(fragment.requireContext(),
+                               fragment.getString(R.string.directions_null),
+                               Toast.LENGTH_LONG).show();
+                return;
+            }
             fragment.googleMap.addPolyline(result.first.first);
             fragment.googleMap.addPolyline(result.first.second);
             fragment.googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(result.second, padding));
