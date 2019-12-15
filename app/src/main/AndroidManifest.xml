@@ -27,6 +27,9 @@
             android:value="685250076671-v2uk6ii19acgok6n2fa8jmog7uqsfamq.apps.googleusercontent.com" />
 
         <activity
+            android:name=".Activity4_test"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait" />
         <activity

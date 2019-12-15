@@ -46,7 +46,8 @@ public class Activity4_MapFragment
     private String getMapViewBundleKey() { return "MapViewBundleKey3"; }
     private int getMapViewId() { return R.id.map_view3; }
 
-    private Activity4_MapFragment() {}
+    // Force using non-default constructor
+    public Activity4_MapFragment() { requireActivity().finish(); }
 
     public Activity4_MapFragment(@NonNull Route route) {
         this.route = route;
