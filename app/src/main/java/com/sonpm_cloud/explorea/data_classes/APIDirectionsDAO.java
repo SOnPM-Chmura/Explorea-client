@@ -267,15 +267,25 @@ public class APIDirectionsDAO {
     }
 
     public static String createGoogleNavigationURL(LatLng[] route, By what) {
-        String url1 = "https://www.google.pl/maps/dir/";
-        String url2 = "data=!3m1!4b1!4m10!4m9!1m3!2m2!1d20!2d52!1m3!2m2!1d20!2d51!";
-        String url3 = "";
-        if (what == APIDirectionsDAO.By.Foot) url3 = "3e1";
-        if (what == APIDirectionsDAO.By.Bike) url3 = "3e2";
-        StringBuilder url = new StringBuilder(url1);
-        for (LatLng coord : route)
-            url.append(coord.latitude).append(",+").append(coord.longitude).append("/");
-        url.append(url2).append(url3);
-        return url.toString();
+        try {
+            if (route.length < 2 || route.length > 25) return null;
+            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1&dir_action=navigate");
+
+            if (what == By.Foot) url.append("&travelmode=walking&waypoints=");
+            else if (what == By.Bike) url.append("&travelmode=walking&waypoints=");
+            else return null;
+
+            for (int i = 0; i < route.length-1; i++) {
+                url.append(URLEncoder.encode((route[i].latitude + "," + route[i].longitude + "|"),
+                                             StandardCharsets.UTF_8.name()));
+            }
+            url.delete(url.length()-3, url.length());
+            url.append("&destination=")
+               .append(URLEncoder.encode((route[route.length-1].latitude + "," + route[route.length-1].longitude + "|"),
+                                         StandardCharsets.UTF_8.name()));
+            return url.toString();
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
     }
 }
