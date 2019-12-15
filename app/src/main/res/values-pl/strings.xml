@@ -9,4 +9,8 @@
     <string name="select_points">Wybierz punkty</string>
     <string name="order_points">Wybierz kolejność</string>
     <string name="directions_null">Nie udało się wyznaczyć trasy dla tych punktów</string>
+    <string name="distFootTooLong">Dystans na pieszo jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="distBikeTooLong">Dystans rowerem jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="pointCountTooBig">Liczba punltów na trasie (%1), maksimum to %2</string>
+
 </resources>

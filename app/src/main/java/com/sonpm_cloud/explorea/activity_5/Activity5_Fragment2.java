@@ -220,6 +220,30 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
     }
 
     private void sendRoute(View view) {
+        if (lastDistFoot > 10000) {
+            Toast.makeText(requireContext(),
+                           getString(R.string.distFootTooLong)
+                                   .replaceAll("\\%1", String.valueOf(lastDistFoot))
+                                   .replaceAll("\\%2", "10000"),
+                           Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (lastDistBike > 30000) {
+            Toast.makeText(requireContext(),
+                           getString(R.string.distBikeTooLong)
+                                   .replaceAll("\\%1", String.valueOf(lastDistBike))
+                                   .replaceAll("\\%2", "10000"),
+                           Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (lastPolyFoot.getPoints().size() > 25) {
+            Toast.makeText(requireContext(),
+                           getString(R.string.pointCountTooBig)
+                                   .replaceAll("\\%1", String.valueOf(lastPolyFoot.getPoints().size()))
+                                   .replaceAll("\\%2", "25"),
+                           Toast.LENGTH_LONG).show();
+            return;
+        }
         List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
                 .map(p -> p.first)
                 .collect(Collectors.toList());

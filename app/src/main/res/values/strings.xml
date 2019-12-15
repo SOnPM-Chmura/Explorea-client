@@ -8,5 +8,8 @@
     <string name="select_points">Select points</string>
     <string name="order_points">Order points</string>
     <string name="directions_null">Could not create directions for this route</string>
+    <string name="distFootTooLong">Distance by foot is too long (%1), maximal is %2 meters</string>
+    <string name="distBikeTooLong">Distance by bike is too long (%1), maximal is %2 meters</string>
+    <string name="pointCountTooBig">Number of points in route is too big (%1), maximal is %2</string>
 
 </resources>

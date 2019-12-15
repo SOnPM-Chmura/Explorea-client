@@ -281,7 +281,7 @@ public class APIDirectionsDAO {
             }
             url.delete(url.length()-3, url.length());
             url.append("&destination=")
-               .append(URLEncoder.encode((route[route.length-1].latitude + "," + route[route.length-1].longitude + "|"),
+               .append(URLEncoder.encode((route[route.length-1].latitude + "," + route[route.length-1].longitude),
                                          StandardCharsets.UTF_8.name()));
             return url.toString();
         } catch (UnsupportedEncodingException e) {
