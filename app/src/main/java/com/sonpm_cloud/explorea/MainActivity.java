@@ -65,20 +65,20 @@ public class MainActivity extends AppCompatActivity {
                 && connectivityManager.getActiveNetworkInfo().isAvailable()
                 && connectivityManager.getActiveNetworkInfo().isConnected();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        LoginActivity.account = GoogleSignIn.getLastSignedInAccount(this);
-        if (LoginActivity.account == null) {
-            launchLoginActivity();
-        }
-
-        Log.d("TOKEN ", LoginActivity.account.getIdToken());
-
-        linearLayoutForRoads = findViewById(R.id.RoadButtonList);
-        requestQueue =  Volley.newRequestQueue(this);
-
         if (connected) {
+            LoginActivity.account = GoogleSignIn.getLastSignedInAccount(this);
+            if (LoginActivity.account == null) {
+                launchLoginActivity();
+            }
+
+            Log.d("TOKEN ", LoginActivity.account.getIdToken());
+
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+            linearLayoutForRoads = findViewById(R.id.RoadButtonList);
+            requestQueue =  Volley.newRequestQueue(this);
+
             sendAddUser();
         }
         else {
@@ -158,9 +158,7 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject jsonObject = (JSONObject) response.get(i);
                                 Log.d("jsonObject", response.get(i).toString());
                                 idRoute = jsonObject.getInt("id");
-//                                codedRoute = jsonObject.getString("codedRoute");
                                 codedRoute = Route.hexDecode(jsonObject.getString("codedRoute"));
-//                                codedRoute = Route.hexDecode(codedRoute);
                                 avgRating = (!jsonObject.get("avgRating").toString().equals("null")) ?  jsonObject.getDouble("avgRating") : 0; //avgRating = jsonObject.getDouble("avgRating");
                                 lengthByFoot = jsonObject.getInt("lengthByFoot");
                                 lengthByBike = jsonObject.getInt("lengthByBike");
@@ -168,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
                                 timeByBike = jsonObject.getInt("timeByBike");
                                 city = (jsonObject.getString("city") != null) ? jsonObject.getString("city"): "";
 
-//                                RouteModel route = new RouteModel(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
                                 Route route = new Route(idRoute,codedRoute,(float)avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
                                 Button btnShow = new Button(this);
                                 String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";
@@ -180,14 +177,6 @@ public class MainActivity extends AppCompatActivity {
                                 btnShow.setOnClickListener(v -> {
                                     Intent intent = new Intent(v.getContext(), RoadActivity.class);
                                     intent.putExtra("ROUTE", route);
-//                                    intent.putExtra("idRoute", route.getId());
-//                                    intent.putExtra("codedRoute", route.getCodedRoute());
-//                                    intent.putExtra("avgRating", route.getAverageRating());
-//                                    intent.putExtra("lengthByFoot", route.getLengthByFoot());
-//                                    intent.putExtra("lengthByBike", route.getLengthByBike());
-//                                    intent.putExtra("timeByFoot", route.getTimeByFoot());
-//                                    intent.putExtra("timeByBike", route.getTimeByBike());
-//                                    intent.putExtra("city", route.getCity());
                                     startActivity(intent);
                                 });
 

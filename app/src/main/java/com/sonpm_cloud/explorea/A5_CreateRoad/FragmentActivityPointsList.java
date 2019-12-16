@@ -1,5 +1,6 @@
 package com.sonpm_cloud.explorea.A5_CreateRoad;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -66,6 +67,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     private int lastTimeBike;
     private String lastCity;
 
+    @SuppressLint("NewApi")
     private synchronized void changeParameters(DirectionsRoute route) {
         if (googleMap == null) return;
         if (lastCalculation > route.queryTime) return;
@@ -76,9 +78,9 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
             lastPolyBike.remove();
         }
         PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
-                .color(R.color.routeFoot);
+                .color(requireContext().getColor(R.color.routeFoot));
         PolylineOptions newBike = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByBike))
-                .color(R.color.routeBike);
+                .color(requireContext().getColor(R.color.routeBike));
         lastPolyFoot = googleMap.addPolyline(newFoot);
         lastPolyBike = googleMap.addPolyline(newBike);
         lastCalculation = route.queryTime;
@@ -251,7 +253,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                     Toast.LENGTH_LONG).show();
             return;
         }
-        if (lastPolyFoot.getPoints().size() > 25) {
+        if (markers.size() > 25) {
             Toast.makeText(requireContext(),
                     getString(R.string.pointCountTooBig)
                             .replaceAll("\\%1", String.valueOf(lastPolyFoot.getPoints().size()))

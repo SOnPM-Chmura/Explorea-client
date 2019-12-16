@@ -18,8 +18,8 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
-import com.sonpm_cloud.explorea.Model.RouteModel;
 import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.data_classes.Route;
 
 import org.json.JSONObject;
 
@@ -86,7 +86,7 @@ public class MyRoadActivity extends AppCompatActivity {
                                         JSONObject jsonObject = (JSONObject) response.get(i);
                                         Log.d("jsonObject", response.get(i).toString());
                                         idRoute = jsonObject.getInt("id");
-                                        codedRoute = jsonObject.getString("codedRoute");
+                                        codedRoute = Route.hexDecode(jsonObject.getString("codedRoute"));
                                         avgRating = (!jsonObject.get("avgRating").toString().equals("null")) ? jsonObject.getDouble("avgRating") : 0; //avgRating = jsonObject.getDouble("avgRating");
                                         lengthByFoot = jsonObject.getInt("lengthByFoot");
                                         lengthByBike = jsonObject.getInt("lengthByBike");
@@ -94,7 +94,7 @@ public class MyRoadActivity extends AppCompatActivity {
                                         timeByBike = jsonObject.getInt("timeByBike");
                                         city = (jsonObject.getString("city") != null) ? jsonObject.getString("city") : "";
 
-                                        RouteModel route = new RouteModel(idRoute, codedRoute, avgRating, lengthByFoot, lengthByBike, timeByFoot, timeByBike, city);
+                                        Route route = new Route(idRoute, codedRoute, (float)avgRating, lengthByFoot, lengthByBike, timeByFoot, timeByBike, city);
                                         Button btnShow = new Button(this);
                                         String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";
                                         btnShow.setText(str);
@@ -104,14 +104,7 @@ public class MyRoadActivity extends AppCompatActivity {
                                         btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                                         btnShow.setOnClickListener(v -> {
                                             Intent intent = new Intent(v.getContext(), RoadActivity.class);
-                                            intent.putExtra("idRoute", route.getId());
-                                            intent.putExtra("codedRoute", route.getCodedRoute());
-                                            intent.putExtra("avgRating", route.getAverageRating());
-                                            intent.putExtra("lengthByFoot", route.getLengthByFoot());
-                                            intent.putExtra("lengthByBike", route.getLengthByBike());
-                                            intent.putExtra("timeByFoot", route.getTimeByFoot());
-                                            intent.putExtra("timeByBike", route.getTimeByBike());
-                                            intent.putExtra("city", route.getCity());
+                                            intent.putExtra("ROUTE", route);
                                             startActivity(intent);
                                         });
 
