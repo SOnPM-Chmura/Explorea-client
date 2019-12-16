@@ -249,27 +249,60 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     }
 
     private void sendRoute(View view) {
-        if (lastDistFoot > 10000) {
+
+        final int DIST_FOOT_MIN = 0;
+        final int DIST_FOOT_MAX = 10000;
+        final int DIST_BIKE_MIN = 0;
+        final int DIST_BIKE_MAX = 30000;
+        final int SIZE_POINT_MIN = 2;
+        final int SIZE_POINT_MAX = 25;
+
+
+        if (lastDistFoot < DIST_FOOT_MIN) {
+            Toast.makeText(requireContext(),
+                           getString(R.string.distFootTooShort)
+                                   .replaceAll("%1", String.valueOf(lastDistFoot))
+                                   .replaceAll("%2", String.valueOf(DIST_FOOT_MIN)),
+                           Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (lastDistFoot > DIST_FOOT_MAX) {
             Toast.makeText(requireContext(),
                     getString(R.string.distFootTooLong)
-                            .replaceAll("\\%1", String.valueOf(lastDistFoot))
-                            .replaceAll("\\%2", "10000"),
+                            .replaceAll("%1", String.valueOf(lastDistFoot))
+                            .replaceAll("%2", String.valueOf(DIST_FOOT_MAX)),
                     Toast.LENGTH_LONG).show();
             return;
         }
-        if (lastDistBike > 30000) {
+        if (lastDistBike < DIST_BIKE_MIN) {
+            Toast.makeText(requireContext(),
+                           getString(R.string.distBikeTooShort)
+                                   .replaceAll("%1", String.valueOf(lastDistBike))
+                                   .replaceAll("%2", String.valueOf(DIST_BIKE_MIN)),
+                           Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (lastDistBike > DIST_BIKE_MAX) {
             Toast.makeText(requireContext(),
                     getString(R.string.distBikeTooLong)
-                            .replaceAll("\\%1", String.valueOf(lastDistBike))
-                            .replaceAll("\\%2", "10000"),
+                            .replaceAll("%1", String.valueOf(lastDistBike))
+                            .replaceAll("%2", String.valueOf(DIST_BIKE_MAX)),
                     Toast.LENGTH_LONG).show();
             return;
         }
-        if (markers.size() > 25) {
+        if (markers.size() < SIZE_POINT_MIN) {
+            Toast.makeText(requireContext(),
+                           getString(R.string.pointCountTooSmall)
+                                   .replaceAll("%1", String.valueOf(markers.size()))
+                                   .replaceAll("%2", String.valueOf(SIZE_POINT_MIN)),
+                           Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (markers.size() > SIZE_POINT_MAX) {
             Toast.makeText(requireContext(),
                     getString(R.string.pointCountTooBig)
-                            .replaceAll("\\%1", String.valueOf(lastPolyFoot.getPoints().size()))
-                            .replaceAll("\\%2", "25"),
+                            .replaceAll("%1", String.valueOf(markers.size()))
+                            .replaceAll("%2", String.valueOf(SIZE_POINT_MAX)),
                     Toast.LENGTH_LONG).show();
             return;
         }
