@@ -1,6 +1,7 @@
 package com.sonpm_cloud.explorea.A4_2_RoadActivity;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.sonpm_cloud.explorea.R;
@@ -38,6 +41,9 @@ public class FragmentMap
 
     private Route route;
     private DirectionsRoute directionsRoute;
+
+    private Polyline polylineFoot;
+    private Polyline polylineBike;
 
     private MapView mapView;
     private GoogleMap googleMap;
@@ -76,10 +82,15 @@ public class FragmentMap
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(
+        View inflate = inflater.inflate(
                 R.layout.activity3_map_fragment,
                 container,
                 false);
+
+        inflate.findViewById(R.id.walk_toggle).setOnClickListener(this::routeToggleHandler);
+        inflate.findViewById(R.id.bike_toggle).setOnClickListener(this::routeToggleHandler);
+
+        return inflate;
     }
 
     public void launchMap(APIDirectionsDAO.By what) {
@@ -152,9 +163,53 @@ public class FragmentMap
                         Toast.LENGTH_LONG).show();
                 return;
             }
-            fragment.googleMap.addPolyline(result.first.first);
-            fragment.googleMap.addPolyline(result.first.second);
+            fragment.polylineFoot = fragment.googleMap.addPolyline(result.first.first);
+            fragment.polylineBike = fragment.googleMap.addPolyline(result.first.second);
             fragment.googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(result.second, padding));
+        }
+    }
+
+    private void routeToggleHandler(View view) {
+
+        boolean isFoot = polylineFoot.isVisible();
+        boolean isBike = polylineBike.isVisible();
+
+        final int TINT_DISABLED = requireContext().getColor(android.R.color.secondary_text_light);
+        final int TINT_FOOT = requireContext().getColor(R.color.routeFoot);
+        final int TINT_BIKE = requireContext().getColor(R.color.routeBike);
+
+        ImageView footToogle = requireView().findViewById(R.id.walk_toggle);
+        ImageView bikeToogle = requireView().findViewById(R.id.bike_toggle);
+
+        switch (view.getId()) {
+            case R.id.walk_toggle:
+                if (!isFoot) {
+                    polylineFoot.setVisible(true);
+                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_FOOT));
+                } else if (isFoot && !isBike) {
+                    polylineFoot.setVisible(false);
+                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                    polylineBike.setVisible(true);
+                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_BIKE));
+                } else if (isFoot && isBike) {
+                    polylineFoot.setVisible(false);
+                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                }
+                break;
+            case R.id.bike_toggle:
+                if (!isBike) {
+                    polylineBike.setVisible(true);
+                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_BIKE));
+                } else if (isBike && !isFoot) {
+                    polylineBike.setVisible(false);
+                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                    polylineFoot.setVisible(true);
+                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_FOOT));
+                } else if (isBike && isFoot) {
+                    polylineBike.setVisible(false);
+                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                }
+                break;
         }
     }
 
