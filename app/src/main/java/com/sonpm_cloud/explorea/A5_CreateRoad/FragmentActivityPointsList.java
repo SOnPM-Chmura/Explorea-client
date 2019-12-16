@@ -1,10 +1,16 @@
 package com.sonpm_cloud.explorea.A5_CreateRoad;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +18,10 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -19,10 +29,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sonpm_cloud.explorea.AbstractGoogleMapContainerFragment;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
+import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
+import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
 import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
+import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.data_classes.U;
+import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
+import com.sonpm_cloud.explorea.maps.route_creating.DirectionsCreatingStrategy;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,6 +53,45 @@ import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragment {
+    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private String url = "https://explorea-server.azurewebsites.net";
+    private RequestQueue requestQueue;
+
+    private Polyline lastPolyFoot;
+    private Polyline lastPolyBike;
+
+    private long lastCalculation;
+    private int lastDistFoot;
+    private int lastDistBike;
+    private int lastTimeFoot;
+    private int lastTimeBike;
+    private String lastCity;
+
+    @SuppressLint("NewApi")
+    private synchronized void changeParameters(DirectionsRoute route) {
+        if (googleMap == null) return;
+        if (lastCalculation > route.queryTime) return;
+        if (lastPolyFoot != null) {
+            lastPolyFoot.remove();
+        }
+        if (lastPolyBike != null) {
+            lastPolyBike.remove();
+        }
+        PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
+                .color(requireContext().getColor(R.color.routeFoot));
+        PolylineOptions newBike = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByBike))
+                .color(requireContext().getColor(R.color.routeBike));
+        lastPolyFoot = googleMap.addPolyline(newFoot);
+        lastPolyBike = googleMap.addPolyline(newBike);
+        lastCalculation = route.queryTime;
+        lastDistFoot = route.lengthByFoot;
+        lastDistBike = route.lengthByBike;
+        lastTimeFoot = route.timeByFoot;
+        lastTimeBike = route.timeByBike;
+        lastCity = route.city;
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(route.bounds,
+                (int) U.dp_px(32, requireContext())));
+    }
 
     private FragmentViewModel viewModel;
 
@@ -63,6 +122,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        requestQueue =  Volley.newRequestQueue(getActivity());
         viewModel = ViewModelProviders.of(requireActivity()).get(FragmentViewModel.class);
 
         recyclerView = requireView().findViewById(R.id.recycler_view);
@@ -74,6 +134,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(recyclerAdapter);
+        requireView().findViewById(R.id.buttonCheck).setOnClickListener(this::sendRoute);
     }
 
     @Override
@@ -113,11 +174,16 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
         viewModel.getPoints().observe(this, _points -> {
 
-            List<LatLng> temp;
-            List<LatLng> toRemove = temp = new LinkedList<>(markers.values());
+            if (_points.size() > 1 && _points.size() < 25)
+                new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
+                        .map(p -> p.first)
+                        .toArray(LatLng[]::new));
+
+            List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
                     .collect(Collectors.toList());
 
+            List<LatLng> temp = new LinkedList<>(toRemove);
 
             toRemove.removeAll(toAdd);
             toAdd.removeAll(temp);
@@ -167,7 +233,112 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                         CameraPosition.fromLatLngZoom(markers[0], getDefZoom())));
             }
+        }
+    }
 
+    private void sendRoute(View view) {
+        if (lastDistFoot > 10000) {
+            Toast.makeText(requireContext(),
+                    getString(R.string.distFootTooLong)
+                            .replaceAll("\\%1", String.valueOf(lastDistFoot))
+                            .replaceAll("\\%2", "10000"),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (lastDistBike > 30000) {
+            Toast.makeText(requireContext(),
+                    getString(R.string.distBikeTooLong)
+                            .replaceAll("\\%1", String.valueOf(lastDistBike))
+                            .replaceAll("\\%2", "10000"),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (markers.size() > 25) {
+            Toast.makeText(requireContext(),
+                    getString(R.string.pointCountTooBig)
+                            .replaceAll("\\%1", String.valueOf(lastPolyFoot.getPoints().size()))
+                            .replaceAll("\\%2", "25"),
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        List<LatLng> lll = StreamSupport.stream(viewModel.getListPoints())
+                .map(p -> p.first)
+                .collect(Collectors.toList());
+        Route ret = new Route(-1,
+                lll,
+                0f,
+                lastDistFoot,
+                lastDistBike,
+                lastTimeFoot,
+                lastTimeBike,
+                lastCity);
+
+        Context context = getContext();
+        Map<String, String> params = new HashMap<>();
+        params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
+        params.put("lengthByFoot", String.valueOf(ret.timeByFoot));
+        params.put("lengthByBike", String.valueOf(ret.lengthByBike));
+        params.put("timeByFoot", String.valueOf(ret.timeByFoot));
+        params.put("timeByBike", String.valueOf(ret.timeByBike));
+        params.put("city", "Łodź");//String.valueOf(ret.city));
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(
+                Request.Method.POST,
+                url + "/routes",
+                new JSONObject(params),
+                response -> {
+//                    Log.d(" RESPONSE JSONPost", response.toString());
+                    Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+                },
+                error -> {
+                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                            .show();
+                    Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
+                    Log.w(TAG, "request response:failed msg=" + error.getMessage());
+                }
+        ) {
+            /** Passing some request headers* */
+            @Override
+            public Map getHeaders() {
+                HashMap headers = new HashMap();
+                headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
+                return headers;
+            }
+        };
+        requestQueue.add(jsonObjReq);
+
+        Log.e("sendRoute", ret.toString());
+        Intent intent = new Intent(requireContext(), RoadActivity.class);
+        intent.putExtra("ROUTE", ret);
+        startActivity(intent);
+    }
+
+    private static class DirectionsGetTask
+            extends AsyncTask<LatLng, Void, DirectionsRoute> {
+
+        FragmentActivityPointsList fragment;
+
+        DirectionsGetTask(FragmentActivityPointsList fragment) {
+            this.fragment = fragment;
+        }
+
+        @Override
+        protected DirectionsRoute doInBackground(LatLng... latLngs) {
+
+            return DirectionsCreatingStrategy
+                    .getRecommendedStrategy(latLngs, fragment.requireContext())
+                    .createDirectionsRoute();
+        }
+
+        @Override
+        protected void onPostExecute(DirectionsRoute result) {
+
+            if (result == null) {
+                Toast.makeText(fragment.requireContext(),
+                        fragment.getString(R.string.directions_null),
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            fragment.changeParameters(result);
         }
     }
 }

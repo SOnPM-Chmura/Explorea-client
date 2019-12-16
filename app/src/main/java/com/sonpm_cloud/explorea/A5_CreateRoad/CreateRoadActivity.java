@@ -1,7 +1,10 @@
 package com.sonpm_cloud.explorea.A5_CreateRoad;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Pair;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,21 +23,34 @@ public class CreateRoadActivity extends AppCompatActivity {
     ViewPager viewPager;
     ViewPagerAdapterCreateRoad adapter;
     FragmentManager fragmentManager;
+    private boolean connected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity5_createroad);
 
-        tabLayout = findViewById(R.id.tab_layout);
-        viewPager = findViewById(R.id.viewPager);
-        fragmentManager = getSupportFragmentManager();
+        connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        connected = connectivityManager.getActiveNetworkInfo() != null
+                && connectivityManager.getActiveNetworkInfo().isAvailable()
+                && connectivityManager.getActiveNetworkInfo().isConnected();
+        if (connected) {
+            tabLayout = findViewById(R.id.tab_layout);
+            viewPager = findViewById(R.id.viewPager);
+            fragmentManager = getSupportFragmentManager();
+        }
+        else {
+            Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
+        }
+
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (tabLayout != null) {
+    protected void onStart() {
+        super.onStart();
+        if (tabLayout != null && connected) {
             fragment1 = FragmentActivityMarkingPoints.newInstance();
             fragment2 = FragmentActivityPointsList.newInstance();
             adapter = new ViewPagerAdapterCreateRoad(fragmentManager,
@@ -44,6 +60,12 @@ public class CreateRoadActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(viewPager);
             viewPager.setOffscreenPageLimit(adapter.fragments.size());
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 
     @Override

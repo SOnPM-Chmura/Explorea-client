@@ -4,6 +4,9 @@
     <string name="logout_button">Sign Out</string>
     <string name="_WIP_send_request">Send request to server</string>
     <string name="request_error_response_msg">Error while connecting with server</string>
+    <string name="no_network_connection">No internet connection</string>
+    <string name="empty_creaded_route_msg">You do not create any routes</string>
+    <string name="empty_favorite_route_msg">You do not have any favourite routes</string>
     <string name="search_track">Search track</string>
     <string name="create_track">Create track</string>
     <string name="mine_tracks">Mine tracks</string>
@@ -23,4 +26,9 @@
     <string name="order_points">Order points</string>
     <string name="routes_found">Routes found</string>
     <string name="welcome_to_explorea">Welcome to Explorea</string>
+    <string name="rate">RATE</string>
+    <string name="directions_null">Could not create directions for this route</string>
+    <string name="distFootTooLong">Distance by foot is too long (%1), maximal is %2 meters</string>
+    <string name="distBikeTooLong">Distance by bike is too long (%1), maximal is %2 meters</string>
+    <string name="pointCountTooBig">Number of points in route is too big (%1), maximal is %2</string>
 </resources>

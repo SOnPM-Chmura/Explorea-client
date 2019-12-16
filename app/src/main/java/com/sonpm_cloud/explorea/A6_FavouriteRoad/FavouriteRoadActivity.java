@@ -2,6 +2,7 @@ package com.sonpm_cloud.explorea.A6_FavouriteRoad;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -13,11 +14,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.sonpm_cloud.explorea.Model.Route;
-import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
+import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.data_classes.Route;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FavouriteRoadActivity extends AppCompatActivity {
 
@@ -25,6 +32,7 @@ public class FavouriteRoadActivity extends AppCompatActivity {
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
     private LinearLayout linearLayoutForRoads;
+    private boolean connected;
 
     private int idRoute;
     private String codedRoute;
@@ -35,68 +43,86 @@ public class FavouriteRoadActivity extends AppCompatActivity {
     private int timeByBike;
     private String city;
 
-    private String[] favoriteRoutes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity6_favouriteroad);
 
-        favoriteRoutes = getIntent().getStringArrayExtra("favoriteRoutes");
+        connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        connected = connectivityManager.getActiveNetworkInfo() != null
+                && connectivityManager.getActiveNetworkInfo().isAvailable()
+                && connectivityManager.getActiveNetworkInfo().isConnected();
 
         linearLayoutForRoads = findViewById(R.id.RoadButtonList);
         requestQueue =  Volley.newRequestQueue(this);
 
-        sendRequest();
     }
 
-    private void sendRequest() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (connected)
+            sendGetFavouriteRoutes();
+        else
+            Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
+    }
+
+    private void sendGetFavouriteRoutes() {
         Context context = this;
-        for (String routeId : favoriteRoutes){
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+        linearLayoutForRoads.removeAllViews();
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
                     Request.Method.GET,
-                    url + "/routes/"+routeId,
+                    url + "/routes/favorite",
                     null,
                     response -> {
                         try {
-                            idRoute = response.getInt("id");
-                            codedRoute = response.getString("codedRoute");
-                            avgRating = (!response.get("avgRating").toString().equals("null")) ?  response.getDouble("avgRating") : 0;
-                            lengthByFoot = response.getInt("lengthByFoot");
-                            lengthByBike = response.getInt("lengthByBike");
-                            timeByFoot = response.getInt("timeByFoot");
-                            timeByBike = response.getInt("timeByBike");
-                            city = (response.getString("city") != null) ? response.getString("city"): "";
+                            if (response == null) {
+                                Toast.makeText(context, getString(R.string.empty_favorite_route_msg), Toast.LENGTH_LONG)
+                                        .show();
+                            } else {
+                                for (int i = 0; i < response.length(); i++) {
+                                    try {
+                                        JSONObject jsonObject = (JSONObject) response.get(i);
+                                        Log.d("jsonObject", response.get(i).toString());
+                                        idRoute = jsonObject.getInt("id");
+                                        codedRoute = Route.hexDecode(jsonObject.getString("codedRoute"));
+                                        avgRating = (!jsonObject.get("avgRating").toString().equals("null")) ? jsonObject.getDouble("avgRating") : 0; //avgRating = jsonObject.getDouble("avgRating");
+                                        lengthByFoot = jsonObject.getInt("lengthByFoot");
+                                        lengthByBike = jsonObject.getInt("lengthByBike");
+                                        timeByFoot = jsonObject.getInt("timeByFoot");
+                                        timeByBike = jsonObject.getInt("timeByBike");
+                                        city = (jsonObject.getString("city") != null) ? jsonObject.getString("city") : "";
 
-                            Route route = new Route(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
-                            Button btnShow = new Button(this);
-                            String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";
-                            btnShow.setText(str);
-                            btnShow.setId(idRoute);
-                            btnShow.setAllCaps(false);
-                            btnShow.setLines(3);
-                            btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//                            btnShow.setOnClickListener(v -> startActivity(new Intent(v.getContext(), RoadActivity.class)));
-                            btnShow.setOnClickListener(v -> {
-                                Intent intent = new Intent(v.getContext(), RoadActivity.class);
-                                intent.putExtra("idRoute", route.getId());
-                                intent.putExtra("codedRoute", route.getCodedRoute());
-                                intent.putExtra("avgRating", route.getAverageRating());
-                                intent.putExtra("lengthByFoot", route.getLengthByFoot());
-                                intent.putExtra("lengthByBike", route.getLengthByBike());
-                                intent.putExtra("timeByFoot", route.getTimeByFoot());
-                                intent.putExtra("timeByBike", route.getTimeByBike());
-                                intent.putExtra("city", route.getCity());
-                                startActivity(intent);
-                            });
+                                        Route route = new Route(idRoute, codedRoute, (float)avgRating, lengthByFoot, lengthByBike, timeByFoot, timeByBike, city);
+                                        Button btnShow = new Button(this);
+                                        String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";
+                                        btnShow.setText(str);
+                                        btnShow.setId(idRoute);
+                                        btnShow.setAllCaps(false);
+                                        btnShow.setLines(3);
+                                        btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                        btnShow.setOnClickListener(v -> {
+                                            Intent intent = new Intent(v.getContext(), RoadActivity.class);
+                                            intent.putExtra("ROUTE", route);
+                                            startActivity(intent);
+                                        });
 
-                            // Add Button to LinearLayout
-                            if (linearLayoutForRoads != null) {
-//                                    Log.d("@", "HERE");
-                                linearLayoutForRoads.addView(btnShow);
+                                        // Add Button to LinearLayout
+                                        if (linearLayoutForRoads != null) {
+                                            linearLayoutForRoads.addView(btnShow);
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        Log.w(TAG, "request response:failed message=" + e.getMessage());
+                                    }
+                                }
                             }
 
-                        }catch (Exception e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                             Log.w(TAG, "request response:failed message=" + e.getMessage());
                         }
@@ -107,8 +133,15 @@ public class FavouriteRoadActivity extends AppCompatActivity {
                         Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
                         Log.w(TAG, "request response:failed msg=" + error.getMessage());
                     }
-            );
+            ) {
+                /** Passing some request headers* */
+                @Override
+                public Map getHeaders() {
+                    HashMap headers = new HashMap();
+                    headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
+                    return headers;
+                }
+            };
             requestQueue.add(jsonObjectRequest);
-        }
     }
 }

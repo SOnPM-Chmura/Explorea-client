@@ -2,6 +2,7 @@ package com.sonpm_cloud.explorea.A4_SearchRoad;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,9 +21,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.sonpm_cloud.explorea.Model.Route;
-import com.sonpm_cloud.explorea.R;
 import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
+import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.data_classes.Route;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,30 +57,40 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity4_searchroad);
 
-        cityText = findViewById(R.id.citySelected);
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null
+                && connectivityManager.getActiveNetworkInfo().isAvailable()
+                && connectivityManager.getActiveNetworkInfo().isConnected()) {
 
-        linearLayoutForRoads = findViewById(R.id.RoadButtonList);
-        requestQueue =  Volley.newRequestQueue(this);
+            cityText = findViewById(R.id.citySelected);
 
-        Spinner transportSpinner = findViewById(R.id.transportSpinner1);
-        Spinner timeSpinner = findViewById(R.id.timeSpinner1);
+            linearLayoutForRoads = findViewById(R.id.RoadButtonList);
+            requestQueue =  Volley.newRequestQueue(this);
 
-        ArrayAdapter<String> arrayTransport = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, transports);
-        arrayTransport.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        transportSpinner.setAdapter(arrayTransport);
+            Spinner transportSpinner = findViewById(R.id.transportSpinner1);
+            Spinner timeSpinner = findViewById(R.id.timeSpinner1);
 
-        ArrayAdapter<String> arrayTime = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, times);
-        arrayTime.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        timeSpinner.setAdapter(arrayTime);
+            ArrayAdapter<String> arrayTransport = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, transports);
+            arrayTransport.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+            transportSpinner.setAdapter(arrayTransport);
 
-        transportSpinner.setOnItemSelectedListener(this);
-        timeSpinner.setOnItemSelectedListener(this);
+            ArrayAdapter<String> arrayTime = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, times);
+            arrayTime.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+            timeSpinner.setAdapter(arrayTime);
 
-        System.out.println(chosenTransport);
-        System.out.println(chosenTime);
+            transportSpinner.setOnItemSelectedListener(this);
+            timeSpinner.setOnItemSelectedListener(this);
 
-        Button buttonSearch = findViewById(R.id.buttonSearch);
-        buttonSearch.setOnClickListener(v -> sendRequest());
+            System.out.println(chosenTransport);
+            System.out.println(chosenTime);
+
+            Button buttonSearch = findViewById(R.id.buttonSearch);
+            buttonSearch.setOnClickListener(v -> sendGetFilteredRoutes());
+        }
+        else {
+            Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
+        }
 
     }
 
@@ -105,18 +116,19 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    private void sendRequest() {
+    private void sendGetFilteredRoutes() {
         chosenCity = String.valueOf(cityText.getText());
 
         if (chosenCity.equals("")) {
             Toast.makeText(this, "Podaj miasto", Toast.LENGTH_LONG).show();
         } else {
+            Log.d("LOG", chosenCity + " " + chosenTime + " " + chosenTransport);
 
             linearLayoutForRoads.removeAllViews();
             Context context = this;
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                     Request.Method.GET,
-                    url + "/routes?city=" +chosenCity + "&time=" + chosenTime + "&transport=" + chosenTransport,
+                    url + "/routes?cityname=" + chosenCity + "&time=" + chosenTime + "&transport=" + chosenTransport,
                     null,
                     response -> {
                         try {
@@ -125,7 +137,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
                                     JSONObject jsonObject = (JSONObject) response.get(i);
                                     Log.d("jsonObject", response.get(i).toString());
                                     idRoute = jsonObject.getInt("id");
-                                    codedRoute = jsonObject.getString("codedRoute");
+                                    codedRoute = Route.hexDecode(jsonObject.getString("codedRoute"));
                                     avgRating = (!jsonObject.get("avgRating").toString().equals("null")) ?  jsonObject.getDouble("avgRating") : 0; //avgRating = jsonObject.getDouble("avgRating");
                                     lengthByFoot = jsonObject.getInt("lengthByFoot");
                                     lengthByBike = jsonObject.getInt("lengthByBike");
@@ -133,8 +145,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
                                     timeByBike = jsonObject.getInt("timeByBike");
                                     city = (jsonObject.getString("city") != null) ? jsonObject.getString("city"): "";
 
-                                    Route route = new Route(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
-    //                                routes.add(new Route(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city));
+                                    Route route = new Route(idRoute,codedRoute, (float)avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
                                     Button btnShow = new Button(this);
                                     String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";
                                     btnShow.setText(str);
@@ -142,23 +153,14 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
                                     btnShow.setAllCaps(false);
                                     btnShow.setLines(3);
                                     btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    //                                btnShow.setOnClickListener(v -> startActivity(new Intent(v.getContext(), RoadActivity.class)));
                                     btnShow.setOnClickListener(v -> {
                                         Intent intent = new Intent(v.getContext(), RoadActivity.class);
-                                        intent.putExtra("idRoute", route.getId());
-                                        intent.putExtra("codedRoute", route.getCodedRoute());
-                                        intent.putExtra("avgRating", route.getAverageRating());
-                                        intent.putExtra("lengthByFoot", route.getLengthByFoot());
-                                        intent.putExtra("lengthByBike", route.getLengthByBike());
-                                        intent.putExtra("timeByFoot", route.getTimeByFoot());
-                                        intent.putExtra("timeByBike", route.getTimeByBike());
-                                        intent.putExtra("city", route.getCity());
+                                        intent.putExtra("ROUTE", route);
                                         startActivity(intent);
                                     });
 
                                     // Add Button to LinearLayout
                                     if (linearLayoutForRoads != null) {
-    //                                    Log.d("@", "HERE");
                                         linearLayoutForRoads.addView(btnShow);
                                     }
 
@@ -166,7 +168,6 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
                                     e.printStackTrace();
                                 }
                             }
-    //                        Log.d("@@@2", idRoute + " " + codedRoute);
 
                         } catch (Exception e) {
                             e.printStackTrace();
