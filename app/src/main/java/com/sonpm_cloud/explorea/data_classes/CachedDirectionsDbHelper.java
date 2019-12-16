@@ -4,12 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class CachedRoutesDbHelper extends SQLiteOpenHelper {
+public class CachedDirectionsDbHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 1;
-    public static final String DB_NAME = "CachedRoutes.db";
+    public static final int DB_VERSION = 4;
+    public static final String DB_NAME = "CachedDirections.db";
 
-    public CachedRoutesDbHelper(Context context) {
+    public CachedDirectionsDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -19,11 +19,16 @@ public class CachedRoutesDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + Structure.NAME + " ( " +
                         Structure.COLUMNS.ENCODED_ROUTE + " TEXT PRIMARY KEY, " +
                         Structure.COLUMNS.CACHING_TIME + " INTEGER, " +
-                        Structure.COLUMNS.ENCODED_DIRECTIONS + " TEXT, " +
+                        Structure.COLUMNS.ENCODED_DIRECTIONS_FOOT + " TEXT, " +
+                        Structure.COLUMNS.ENCODED_DIRECTIONS_BIKE + " TEXT, " +
                         Structure.COLUMNS.LENGTH_BY_FOOT + " INTEGER, " +
                         Structure.COLUMNS.LENGTH_BY_BIKE + " INTEGER, " +
                         Structure.COLUMNS.TIME_BY_FOOT + " INTEGER, " +
-                        Structure.COLUMNS.TIME_BY_BIKE + " INTEGER )"
+                        Structure.COLUMNS.TIME_BY_BIKE + " INTEGER," +
+                        Structure.COLUMNS.BOUNDS_NE_LAT + " DOUBLE, " +
+                        Structure.COLUMNS.BOUNDS_NE_LNG + " DOUBLE, " +
+                        Structure.COLUMNS.BOUNDS_SW_LAT + " DOUBLE, " +
+                        Structure.COLUMNS.BOUNDS_SW_LNG + " DOUBLE )"
         );
         init(db);
     }
@@ -35,16 +40,21 @@ public class CachedRoutesDbHelper extends SQLiteOpenHelper {
     }
 
     public interface Structure {
-        String NAME = "CachedRoutes";
+        String NAME = "CachedDirections";
 
         interface COLUMNS {
             String ENCODED_ROUTE = "EncodedRoute";
             String CACHING_TIME = "CachingTime";
-            String ENCODED_DIRECTIONS = "EncodedDirections";
+            String ENCODED_DIRECTIONS_FOOT = "EncodedDirectionsByFoot";
+            String ENCODED_DIRECTIONS_BIKE = "EncodedDirectionsByBike";
             String LENGTH_BY_FOOT = "LengthByFoot";
             String LENGTH_BY_BIKE = "LengthByBike";
             String TIME_BY_FOOT = "TimeByFoot";
             String TIME_BY_BIKE = "TimeByBike";
+            String BOUNDS_NE_LAT = "BoundsNELat";
+            String BOUNDS_NE_LNG = "BoundsNELng";
+            String BOUNDS_SW_LAT = "BoundsSWLat";
+            String BOUNDS_SW_LNG = "BoundsSWLng";
         }
     }
 

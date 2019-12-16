@@ -27,32 +27,16 @@ public class RouteModel {
         return lengthByFoot;
     }
 
-    public void setLengthByFoot(Integer lengthByFoot) {
-        this.lengthByFoot = lengthByFoot;
-    }
-
     public Integer getLengthByBike() {
         return lengthByBike;
-    }
-
-    public void setLengthByBike(Integer lengthByBike) {
-        this.lengthByBike = lengthByBike;
     }
 
     public Integer getTimeByFoot() {
         return timeByFoot;
     }
 
-    public void setTimeByFoot(Integer timeByFoot) {
-        this.timeByFoot = timeByFoot;
-    }
-
     public Integer getTimeByBike() {
         return timeByBike;
-    }
-
-    public void setTimeByBike(Integer timeByBike) {
-        this.timeByBike = timeByBike;
     }
 
     public Integer getId() {
@@ -67,16 +51,8 @@ public class RouteModel {
         return codedRoute;
     }
 
-    public void setCodedRoute(String codedRoute) {
-        this.codedRoute = codedRoute;
-    }
-
     public Double getAverageRating() {
         return avgRating;
-    }
-
-    public void setAverageRating(Double averageRating) {
-        this.avgRating = averageRating;
     }
 
     public String getCity() {

@@ -2,6 +2,7 @@ package com.sonpm_cloud.explorea.A6_FavouriteRoad;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
 import com.sonpm_cloud.explorea.Model.RouteModel;
 import com.sonpm_cloud.explorea.R;
@@ -30,6 +32,7 @@ public class FavouriteRoadActivity extends AppCompatActivity {
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
     private LinearLayout linearLayoutForRoads;
+    private boolean connected;
 
     private int idRoute;
     private String codedRoute;
@@ -39,27 +42,37 @@ public class FavouriteRoadActivity extends AppCompatActivity {
     private int timeByFoot;
     private int timeByBike;
     private String city;
-    private String token;
 
-//    private String[] favoriteRoutes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity6_favouriteroad);
 
-//        favoriteRoutes = getIntent().getStringArrayExtra("favoriteRoutes");
-        token = getIntent().getStringExtra("token");
+        connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        connected = connectivityManager.getActiveNetworkInfo() != null
+                && connectivityManager.getActiveNetworkInfo().isAvailable()
+                && connectivityManager.getActiveNetworkInfo().isConnected();
 
         linearLayoutForRoads = findViewById(R.id.RoadButtonList);
         requestQueue =  Volley.newRequestQueue(this);
 
-        sendRequest();
     }
 
-    private void sendRequest() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (connected)
+            sendGetFavouriteRoutes();
+        else
+            Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
+    }
+
+    private void sendGetFavouriteRoutes() {
         Context context = this;
-//        for (String routeId : favoriteRoutes){
+        linearLayoutForRoads.removeAllViews();
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
                     Request.Method.GET,
                     url + "/routes/favorite",
@@ -91,7 +104,6 @@ public class FavouriteRoadActivity extends AppCompatActivity {
                                         btnShow.setAllCaps(false);
                                         btnShow.setLines(3);
                                         btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-                                        //                            btnShow.setOnClickListener(v -> startActivity(new Intent(v.getContext(), RoadActivity.class)));
                                         btnShow.setOnClickListener(v -> {
                                             Intent intent = new Intent(v.getContext(), RoadActivity.class);
                                             intent.putExtra("idRoute", route.getId());
@@ -107,7 +119,6 @@ public class FavouriteRoadActivity extends AppCompatActivity {
 
                                         // Add Button to LinearLayout
                                         if (linearLayoutForRoads != null) {
-                                            //                                    Log.d("@", "HERE");
                                             linearLayoutForRoads.addView(btnShow);
                                         }
 
@@ -117,7 +128,6 @@ public class FavouriteRoadActivity extends AppCompatActivity {
                                     }
                                 }
                             }
-//                        Log.d("@@@2", idRoute + " " + codedRoute);
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -135,11 +145,10 @@ public class FavouriteRoadActivity extends AppCompatActivity {
                 @Override
                 public Map getHeaders() {
                     HashMap headers = new HashMap();
-                    headers.put("authorization", "Bearer " + token);
+                    headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
                     return headers;
                 }
             };
             requestQueue.add(jsonObjectRequest);
-//        }
     }
 }

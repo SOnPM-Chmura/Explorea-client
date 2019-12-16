@@ -2,6 +2,7 @@ package com.sonpm_cloud.explorea;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,7 +15,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
@@ -28,14 +28,12 @@ import com.sonpm_cloud.explorea.A4_SearchRoad.SearchRoadActivity;
 import com.sonpm_cloud.explorea.A5_CreateRoad.CreateRoadActivity;
 import com.sonpm_cloud.explorea.A6_FavouriteRoad.FavouriteRoadActivity;
 import com.sonpm_cloud.explorea.A7_MyRoad.MyRoadActivity;
-import com.sonpm_cloud.explorea.Model.RouteModel;
+import com.sonpm_cloud.explorea.data_classes.Route;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
-    private LinearLayout linearLayoutForRoads;// = findViewById(R.id.RoadButtonList);
-    private List<RouteModel> routes;
+    private LinearLayout linearLayoutForRoads;
+    private boolean connected;
 
     private int idRoute;
     private String codedRoute;
@@ -54,31 +52,39 @@ public class MainActivity extends AppCompatActivity {
     private int timeByFoot;
     private int timeByBike;
     private String city;
-    private String token = null;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity3_main_roadlist);
+
+        connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        connected = connectivityManager.getActiveNetworkInfo() != null
+                && connectivityManager.getActiveNetworkInfo().isAvailable()
+                && connectivityManager.getActiveNetworkInfo().isConnected();
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         LoginActivity.account = GoogleSignIn.getLastSignedInAccount(this);
         if (LoginActivity.account == null) {
             launchLoginActivity();
-
         }
-        token = LoginActivity.account.getIdToken();
-        Log.d("TOKEN ", token);
+
+        Log.d("TOKEN ", LoginActivity.account.getIdToken());
 
         linearLayoutForRoads = findViewById(R.id.RoadButtonList);
-        requestQueue =  Volley.newRequestQueue(this);//VolleySingleton.getInstance(this).getRequestQueue();
+        requestQueue =  Volley.newRequestQueue(this);
 
-        routes = new ArrayList<>();
-
-        sendAddUser();
-//        sendGetRoutes();
+        if (connected) {
+            sendAddUser();
+        }
+        else {
+            Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override
@@ -91,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         boolean result = false;
-        Intent intent;
 
         switch (id) {
             case R.id.search_track_button:
@@ -103,17 +108,11 @@ public class MainActivity extends AppCompatActivity {
                 result = true;
                 break;
             case R.id.favourite_track_button:
-                intent = new Intent(this, FavouriteRoadActivity.class);
-                intent.putExtra("token", token);
-                startActivity(intent);
-//                sendRequestForUsers("4", "FavouriteRoadActivity");
+                startActivity(new Intent(this, FavouriteRoadActivity.class));
                 result = true;
                 break;
             case R.id.mine_track_button:
-                intent = new Intent(this, MyRoadActivity.class);
-                intent.putExtra("token", token);
-                startActivity(intent);
-//                sendRequestForUsers("5", "MyRoadActivity");
+                startActivity(new Intent(this, MyRoadActivity.class));
                 result = true;
                 break;
             case R.id.logout_button:
@@ -159,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject jsonObject = (JSONObject) response.get(i);
                                 Log.d("jsonObject", response.get(i).toString());
                                 idRoute = jsonObject.getInt("id");
-                                codedRoute = jsonObject.getString("codedRoute");
+//                                codedRoute = jsonObject.getString("codedRoute");
+                                codedRoute = Route.hexDecode(jsonObject.getString("codedRoute"));
+//                                codedRoute = Route.hexDecode(codedRoute);
                                 avgRating = (!jsonObject.get("avgRating").toString().equals("null")) ?  jsonObject.getDouble("avgRating") : 0; //avgRating = jsonObject.getDouble("avgRating");
                                 lengthByFoot = jsonObject.getInt("lengthByFoot");
                                 lengthByBike = jsonObject.getInt("lengthByBike");
@@ -167,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
                                 timeByBike = jsonObject.getInt("timeByBike");
                                 city = (jsonObject.getString("city") != null) ? jsonObject.getString("city"): "";
 
-                                RouteModel route = new RouteModel(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
-//                                routes.add(new Route(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city));
+//                                RouteModel route = new RouteModel(idRoute,codedRoute,avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
+                                Route route = new Route(idRoute,codedRoute,(float)avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city);
                                 Button btnShow = new Button(this);
                                 String str = city + " \tOcena: " + avgRating + "\nBy foot: " + lengthByFoot + " m, " + timeByFoot + " min" + "\nBy bike: " + lengthByBike + " m, " + timeByBike + " min";
                                 btnShow.setText(str);
@@ -176,23 +177,22 @@ public class MainActivity extends AppCompatActivity {
                                 btnShow.setAllCaps(false);
                                 btnShow.setLines(3);
                                 btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//                                btnShow.setOnClickListener(v -> startActivity(new Intent(v.getContext(), RoadActivity.class)));
                                 btnShow.setOnClickListener(v -> {
                                     Intent intent = new Intent(v.getContext(), RoadActivity.class);
-                                    intent.putExtra("idRoute", route.getId());
-                                    intent.putExtra("codedRoute", route.getCodedRoute());
-                                    intent.putExtra("avgRating", route.getAverageRating());
-                                    intent.putExtra("lengthByFoot", route.getLengthByFoot());
-                                    intent.putExtra("lengthByBike", route.getLengthByBike());
-                                    intent.putExtra("timeByFoot", route.getTimeByFoot());
-                                    intent.putExtra("timeByBike", route.getTimeByBike());
-                                    intent.putExtra("city", route.getCity());
+                                    intent.putExtra("ROUTE", route);
+//                                    intent.putExtra("idRoute", route.getId());
+//                                    intent.putExtra("codedRoute", route.getCodedRoute());
+//                                    intent.putExtra("avgRating", route.getAverageRating());
+//                                    intent.putExtra("lengthByFoot", route.getLengthByFoot());
+//                                    intent.putExtra("lengthByBike", route.getLengthByBike());
+//                                    intent.putExtra("timeByFoot", route.getTimeByFoot());
+//                                    intent.putExtra("timeByBike", route.getTimeByBike());
+//                                    intent.putExtra("city", route.getCity());
                                     startActivity(intent);
                                 });
 
                                 // Add Button to LinearLayout
                                 if (linearLayoutForRoads != null) {
-//                                    Log.d("@", "HERE");
                                     linearLayoutForRoads.addView(btnShow);
                                 }
 
@@ -200,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-//                        Log.d("@@@2", idRoute + " " + codedRoute);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -216,9 +215,9 @@ public class MainActivity extends AppCompatActivity {
         ) {
             /** Passing some request headers* */
             @Override
-            public Map getHeaders() throws AuthFailureError {
+            public Map getHeaders() {
                 HashMap headers = new HashMap();
-                headers.put("authorization", "Bearer " + token);
+                headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
                 return headers;
             }
         };
@@ -227,12 +226,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendAddUser(){
         Context context = this;
-//        Map<String, String> params = new HashMap<String, String>();
-//        params.put("","");
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(
                 Request.Method.POST,
                 url + "/users",
-                null,//new JSONObject(params),
+                null,
                 response -> {
 //                    Log.d(" RESPONSE JSONPost", response.toString());
                     Log.d(" RESPONSE JSONPost", "DODANO");
@@ -248,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Map getHeaders() {
                 HashMap headers = new HashMap();
-                headers.put("authorization", "Bearer " + token);
+                headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
                 return headers;
             }
         };
@@ -258,14 +255,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        sendGetRoutes();
+        Context context = this;
+        if (connected) {
+            //we are connected to a network
+            sendGetRoutes();
+        }
+        else
+            Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
     }
-
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        finish();
-//    }
 }
 
 //        StringRequest postRequest = new StringRequest(

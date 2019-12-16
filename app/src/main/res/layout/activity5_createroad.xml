@@ -5,7 +5,6 @@
     android:id="@+id/activity5_createroad"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!--    android:background="@color/colorPrimaryDark"-->
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
@@ -27,28 +26,3 @@
     </androidx.viewpager.widget.ViewPager>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<LinearLayout-->
-    <!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    android:id="@+id/activity5_createroad"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:layout_height="match_parent"-->
-    <!--    android:orientation="vertical">-->
-
-    <!--    <androidx.viewpager.widget.ViewPager-->
-    <!--        android:id="@+id/viewPager"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content">-->
-
-    <!--        <androidx.viewpager.widget.PagerTabStrip-->
-    <!--            android:id="@+id/pager_header"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_gravity="top"-->
-    <!--            android:background="@color/colorPrimary"-->
-    <!--            android:padding="15sp"/>-->
-
-    <!--    </androidx.viewpager.widget.ViewPager>-->
-
-    <!--</LinearLayout>-->

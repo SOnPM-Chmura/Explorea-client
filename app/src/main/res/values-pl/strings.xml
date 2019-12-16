@@ -5,6 +5,7 @@
     <string name="logout_button">Wyloguj</string>
     <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
     <string name="request_error_response_msg">Błąd w trakcie łączenia z serwerem</string>
+    <string name="no_network_connection">Brak połączenia z internetem</string>
     <string name="empty_creaded_route_msg">Nie utworzyłeś żadnych tras</string>
     <string name="empty_favorite_route_msg">Nie masz żadnych ulubionych tras</string>
     <string name="search_track">Wyszukiwanie tras</string>
@@ -27,4 +28,8 @@
     <string name="routes_found">Znalezione trasy</string>
     <string name="welcome_to_explorea">Witaj w Explorea</string>
     <string name="rate">Oceń</string>
+    <string name="directions_null">Nie udało się wyznaczyć trasy dla tych punktów</string>
+    <string name="distFootTooLong">Dystans na pieszo jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="distBikeTooLong">Dystans rowerem jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="pointCountTooBig">Liczba punltów na trasie (%1), maksimum to %2</string>
 </resources>

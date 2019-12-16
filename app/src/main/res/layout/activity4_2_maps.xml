@@ -64,14 +64,12 @@
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
-        <com.google.android.gms.maps.MapView
-        android:id="@+id/map_view4_2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintDimensionRatio="4:3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <FrameLayout
+            android:id="@+id/frameL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+        </FrameLayout>
 
     </LinearLayout>
 
