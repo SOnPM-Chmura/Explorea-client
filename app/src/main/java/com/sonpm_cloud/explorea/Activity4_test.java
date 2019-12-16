@@ -1,12 +1,11 @@
 package com.sonpm_cloud.explorea;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.sonpm_cloud.explorea.data_classes.APIDirectionsDAO;
 import com.sonpm_cloud.explorea.data_classes.Route;

@@ -1,5 +1,6 @@
 package com.sonpm_cloud.explorea.activity_5;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.AsyncTask;
@@ -27,12 +28,12 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.sonpm_cloud.explorea.Activity4_test;
-import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
-import com.sonpm_cloud.explorea.data_classes.Route;
-import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.R;
+import com.sonpm_cloud.explorea.data_classes.DirectionsRoute;
 import com.sonpm_cloud.explorea.data_classes.MutablePair;
+import com.sonpm_cloud.explorea.data_classes.Route;
 import com.sonpm_cloud.explorea.data_classes.U;
+import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.maps.route_creating.DirectionsCreatingStrategy;
 
 import java.util.HashMap;
@@ -55,6 +56,7 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
     private int lastTimeBike;
     private String lastCity;
 
+    @SuppressLint("NewApi")
     private synchronized void changeParameters(DirectionsRoute route) {
         if (googleMap == null) return;
         if (lastCalculation > route.queryTime) return;
@@ -65,9 +67,9 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
             lastPolyBike.remove();
         }
         PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
-                                                       .color(R.color.routeFoot);
+                                                       .color(requireContext().getColor(R.color.routeFoot));
         PolylineOptions newBike = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByBike))
-                                                       .color(R.color.routeBike);
+                                                       .color(requireContext().getColor(R.color.routeBike));
         lastPolyFoot = googleMap.addPolyline(newFoot);
         lastPolyBike = googleMap.addPolyline(newBike);
         lastCalculation = route.queryTime;
@@ -239,7 +241,7 @@ public class Activity5_Fragment2 extends AbstractGoogleMapContainerFragment {
                            Toast.LENGTH_LONG).show();
             return;
         }
-        if (lastPolyFoot.getPoints().size() > 25) {
+        if (markers.size() > 25) {
             Toast.makeText(requireContext(),
                            getString(R.string.pointCountTooBig)
                                    .replaceAll("\\%1", String.valueOf(lastPolyFoot.getPoints().size()))

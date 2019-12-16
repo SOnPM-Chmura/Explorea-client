@@ -4,17 +4,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
-
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -82,13 +80,8 @@ public class Activity4_MapFragment
     }
 
     public void launchMap(APIDirectionsDAO.By what) {
-        LatLng[] directions;
-        if (what == APIDirectionsDAO.By.Foot) directions = PolyUtil.decode(directionsRoute.encodedDirectionsByFoot)
-                                                                   .toArray(new LatLng[0]);
-        else if(what == APIDirectionsDAO.By.Bike) directions = PolyUtil.decode(directionsRoute.encodedDirectionsByBike)
-                                                                       .toArray(new LatLng[0]);
-        else return;
-        String url = APIDirectionsDAO.createGoogleNavigationURL(directions, what);
+        String url = APIDirectionsDAO.createGoogleNavigationURL(directionsRoute.decodedRoute().toArray(new LatLng[0]),
+                                                                what);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(intent);
     }
@@ -130,11 +123,11 @@ public class Activity4_MapFragment
                     .createDirectionsRoute();
             fragment.directionsRoute = r;
             List<LatLng> decodeDirF = PolyUtil.decode(r.encodedDirectionsByFoot);
-            List<LatLng> decodeDirB = PolyUtil.decode(r.encodedDirectionsByFoot);
+            List<LatLng> decodeDirB = PolyUtil.decode(r.encodedDirectionsByBike);
             PolylineOptions polylineOptionsFoot = new PolylineOptions()
-                    .addAll(decodeDirF).color(R.color.routeFoot);
+                    .addAll(decodeDirF).color(fragment.requireContext().getColor(R.color.routeFoot));
             PolylineOptions polylineOptionsBike = new PolylineOptions()
-                    .addAll(decodeDirB).color(R.color.routeBike);
+                    .addAll(decodeDirB).color(fragment.requireContext().getColor(R.color.routeBike));
 
             return Pair.create(
                     Pair.create(polylineOptionsFoot, polylineOptionsBike),

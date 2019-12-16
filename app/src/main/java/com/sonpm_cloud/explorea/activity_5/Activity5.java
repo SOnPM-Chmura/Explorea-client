@@ -1,7 +1,6 @@
 package com.sonpm_cloud.explorea.activity_5;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;

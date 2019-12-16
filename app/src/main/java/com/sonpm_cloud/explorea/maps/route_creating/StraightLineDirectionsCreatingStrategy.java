@@ -56,8 +56,8 @@ public class StraightLineDirectionsCreatingStrategy extends DirectionsCreatingSt
                 0f,
                 (int) distance,
                 (int) distance,
-                (int) ((distance / 1000) / 5) * 60,
-                (int) ((distance / 1000) / 20) * 60,
+                (int) (((distance / 1000) / 5) * 60),
+                (int) (((distance / 1000) / 20) * 60),
                 city,
                 bounds.build());
     }

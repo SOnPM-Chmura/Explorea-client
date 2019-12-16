@@ -33,14 +33,14 @@ public class Route implements Serializable {
             String city) {
         this.id = id;
         this.encodedRoute = encodedRoute;
-        if (avgRating < 0 || avgRating > 5)
-            throw th("Rating value must be between 0 and 5");
+//        if (avgRating < 0 || avgRating > 5)
+//            throw th("Rating value must be between 0 and 5");
         this.avgRating = avgRating;
-        if (lengthByFoot < 0 || lengthByFoot > 10000)
-            throw th("Length by foot value must be between 0 and 10000");
+//        if (lengthByFoot < 0 || lengthByFoot > 10000)
+//            throw th("Length by foot value must be between 0 and 10000");
         this.lengthByFoot = lengthByFoot;
-        if (lengthByBike < 0 || lengthByBike > 30000)
-            throw th("Length by bike value must be between 0 and 30000");
+//        if (lengthByBike < 0 || lengthByBike > 30000)
+//            throw th("Length by bike value must be between 0 and 30000");
         this.lengthByBike = lengthByBike;
         this.timeByFoot = timeByFoot;
         this.timeByBike = timeByBike;
