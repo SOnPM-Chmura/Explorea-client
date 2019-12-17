@@ -75,6 +75,7 @@ public class MyRoadActivity extends AppCompatActivity {
 
     private void sendGetCreatedRoutes() {
         Context context = this;
+        linearLayoutForRoads.removeAllViews();
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
                     Request.Method.GET,
                     url + "/routes/created",
