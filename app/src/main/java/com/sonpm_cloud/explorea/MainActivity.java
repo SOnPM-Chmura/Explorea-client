@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
             LoginActivity.account = GoogleSignIn.getLastSignedInAccount(this);
             if (LoginActivity.account == null) {
                 launchLoginActivity();
+                finish();
+                return;
             }
 
             Log.d("TOKEN ", LoginActivity.account.getIdToken());
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             LoginActivity.account = null;
             launchLoginActivity();
+            finish();
         });
     }
 
