@@ -15,7 +15,11 @@
         <com.google.android.gms.maps.MapView
             android:id="@+id/map_view3"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="112dp"
@@ -29,10 +33,10 @@
                 style="@style/Widget.AppCompat.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true"
+                android:clickable="false"
                 android:focusable="true"
                 android:src="@drawable/ic_directions_walk_black_24dp"
-                android:tint="@color/routeFoot"
+                android:tint="@android:color/darker_gray"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/bike_toggle"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -44,10 +48,10 @@
                 style="@style/Widget.AppCompat.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true"
+                android:clickable="false"
                 android:focusable="true"
                 android:src="@drawable/ic_directions_bike_black_24dp"
-                android:tint="@color/routeBike"
+                android:tint="@android:color/darker_gray"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"

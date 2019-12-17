@@ -87,6 +87,8 @@ public class FragmentMap
 
         inflate.findViewById(R.id.walk_toggle).setOnClickListener(this::routeToggleHandler);
         inflate.findViewById(R.id.bike_toggle).setOnClickListener(this::routeToggleHandler);
+        inflate.findViewById(R.id.walk_toggle);
+        inflate.findViewById(R.id.bike_toggle);
 
         return inflate;
     }
@@ -159,6 +161,12 @@ public class FragmentMap
             }
             fragment.polylineFoot = fragment.googleMap.addPolyline(result.first.first);
             fragment.polylineBike = fragment.googleMap.addPolyline(result.first.second);
+            fragment.requireView().findViewById(R.id.walk_toggle).setClickable(true);
+            fragment.requireView().findViewById(R.id.bike_toggle).setClickable(true);
+            ((ImageView) fragment.requireView().findViewById(R.id.walk_toggle))
+                    .setImageTintList(ColorStateList.valueOf(fragment.requireContext().getColor(R.color.routeFoot)));
+            ((ImageView) fragment.requireView().findViewById(R.id.bike_toggle))
+                    .setImageTintList(ColorStateList.valueOf(fragment.requireContext().getColor(R.color.routeBike)));
             fragment.googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(result.second, padding));
         }
     }
