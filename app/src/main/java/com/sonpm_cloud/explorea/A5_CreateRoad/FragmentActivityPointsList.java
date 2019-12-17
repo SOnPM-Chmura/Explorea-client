@@ -249,7 +249,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     }
 
     private void sendRoute(View view) {
-
         final int DIST_FOOT_MIN = 0;
         final int DIST_FOOT_MAX = 10000;
         final int DIST_BIKE_MIN = 0;
@@ -260,10 +259,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
         if (lastDistFoot < DIST_FOOT_MIN) {
             Toast.makeText(requireContext(),
-                           getString(R.string.distFootTooShort)
-                                   .replaceAll("%1", String.valueOf(lastDistFoot))
-                                   .replaceAll("%2", String.valueOf(DIST_FOOT_MIN)),
-                           Toast.LENGTH_LONG).show();
+                    getString(R.string.distFootTooShort)
+                            .replaceAll("%1", String.valueOf(lastDistFoot))
+                            .replaceAll("%2", String.valueOf(DIST_FOOT_MIN)),
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (lastDistFoot > DIST_FOOT_MAX) {
@@ -276,10 +275,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         }
         if (lastDistBike < DIST_BIKE_MIN) {
             Toast.makeText(requireContext(),
-                           getString(R.string.distBikeTooShort)
-                                   .replaceAll("%1", String.valueOf(lastDistBike))
-                                   .replaceAll("%2", String.valueOf(DIST_BIKE_MIN)),
-                           Toast.LENGTH_LONG).show();
+                    getString(R.string.distBikeTooShort)
+                            .replaceAll("%1", String.valueOf(lastDistBike))
+                            .replaceAll("%2", String.valueOf(DIST_BIKE_MIN)),
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (lastDistBike > DIST_BIKE_MAX) {
@@ -292,10 +291,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         }
         if (markers.size() < SIZE_POINT_MIN) {
             Toast.makeText(requireContext(),
-                           getString(R.string.pointCountTooSmall)
-                                   .replaceAll("%1", String.valueOf(markers.size()))
-                                   .replaceAll("%2", String.valueOf(SIZE_POINT_MIN)),
-                           Toast.LENGTH_LONG).show();
+                    getString(R.string.pointCountTooSmall)
+                            .replaceAll("%1", String.valueOf(markers.size()))
+                            .replaceAll("%2", String.valueOf(SIZE_POINT_MIN)),
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (markers.size() > SIZE_POINT_MAX) {
@@ -325,14 +324,19 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         params.put("lengthByBike", String.valueOf(ret.lengthByBike));
         params.put("timeByFoot", String.valueOf(ret.timeByFoot));
         params.put("timeByBike", String.valueOf(ret.timeByBike));
-        params.put("city", "Łodź");//String.valueOf(ret.city));
+        params.put("city", ret.city); //"Łódź");//
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(
                 Request.Method.POST,
                 url + "/routes",
                 new JSONObject(params),
                 response -> {
-//                    Log.d(" RESPONSE JSONPost", response.toString());
-                    Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+//                    try {
+                        Log.d(" RESPONSE JSONPost", response.toString());
+                        Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+//                        int idRoute = response.getInt("idRoute");
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
                 },
                 error -> {
                     Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
