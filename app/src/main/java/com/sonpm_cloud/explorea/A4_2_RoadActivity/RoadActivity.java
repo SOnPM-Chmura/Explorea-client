@@ -21,7 +21,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.R;
-import com.sonpm_cloud.explorea.data_classes.APIDirectionsDAO;
 import com.sonpm_cloud.explorea.data_classes.Route;
 
 import org.json.JSONObject;
@@ -95,7 +94,7 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         FragmentMap fragment = new FragmentMap(route);
         fragmentTransaction.replace(R.id.frameL, fragment).commit();
         findViewById(R.id.buttonStart).setOnClickListener(v ->
-                fragment.launchMap(APIDirectionsDAO.By.Bike));
+                fragment.launchMap());
 
     }
 

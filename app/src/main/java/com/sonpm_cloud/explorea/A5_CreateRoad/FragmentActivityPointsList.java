@@ -1,6 +1,5 @@
 package com.sonpm_cloud.explorea.A5_CreateRoad;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -44,6 +43,7 @@ import com.sonpm_cloud.explorea.data_classes.U;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.maps.route_creating.DirectionsCreatingStrategy;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -62,8 +62,8 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     private Polyline lastPolyFoot;
     private Polyline lastPolyBike;
 
-    private boolean footVisible = true;
-    private boolean bikeVisible = true;
+    private boolean footVisible = false;
+    private boolean bikeVisible = false;
 
     private long lastCalculation;
     private int lastDistFoot;
@@ -72,15 +72,28 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     private int lastTimeBike;
     private String lastCity;
 
-    @SuppressLint("NewApi")
     private synchronized void changeParameters(DirectionsRoute route) {
         if (googleMap == null) return;
-        if (lastCalculation > route.queryTime) return;
+        //if (lastCalculation > route.queryTime) return;
         if (lastPolyFoot != null) {
             lastPolyFoot.remove();
+        } else {
+            footVisible = true;
+            requireView().findViewById(R.id.walk_toggle).setClickable(true);
+            ((ImageView) requireView().findViewById(R.id.walk_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(R.color.routeFoot)));
+            requireView().findViewById(R.id.walk_toggle)
+                    .setOnClickListener(this::routeToggleHandler);
         }
         if (lastPolyBike != null) {
             lastPolyBike.remove();
+        } else {
+            bikeVisible = true;
+            requireView().findViewById(R.id.bike_toggle).setClickable(true);
+            ((ImageView) requireView().findViewById(R.id.bike_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(R.color.routeBike)));
+            requireView().findViewById(R.id.bike_toggle)
+                    .setOnClickListener(this::routeToggleHandler);
         }
         PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
                 .color(requireContext().getColor(R.color.routeFoot));
@@ -124,9 +137,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 container,
                 false
         );
-
-        inflate.findViewById(R.id.walk_toggle).setOnClickListener(this::routeToggleHandler);
-        inflate.findViewById(R.id.bike_toggle).setOnClickListener(this::routeToggleHandler);
 
         return inflate;
     }
@@ -186,10 +196,15 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
         viewModel.getPoints().observe(this, _points -> {
 
-            if (_points.size() > 1 && _points.size() < 25)
+            if (_points.size() > 1 && _points.size() < 25) {
+                if (lastPolyFoot != null)
+                    lastPolyFoot.setColor(requireContext().getColor(android.R.color.darker_gray));
+                if (lastPolyBike != null)
+                    lastPolyBike.setColor(requireContext().getColor(android.R.color.darker_gray));
                 new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
                         .map(p -> p.first)
                         .toArray(LatLng[]::new));
+            }
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
@@ -317,26 +332,28 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 lastTimeBike,
                 lastCity);
 
+        final int[] idRoute = new int[1];
         Context context = getContext();
         Map<String, String> params = new HashMap<>();
         params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
-        params.put("lengthByFoot", String.valueOf(ret.timeByFoot));
+        params.put("lengthByFoot", String.valueOf(ret.lengthByFoot));
         params.put("lengthByBike", String.valueOf(ret.lengthByBike));
         params.put("timeByFoot", String.valueOf(ret.timeByFoot));
         params.put("timeByBike", String.valueOf(ret.timeByBike));
-        params.put("city", ret.city); //"Łódź");//
+        params.put("city", ret.city);
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(
                 Request.Method.POST,
                 url + "/routes",
                 new JSONObject(params),
                 response -> {
-//                    try {
+                    try {
                         Log.d(" RESPONSE JSONPost", response.toString());
                         Log.d(" RESPONSE JSONPost", "DODANO TRASE");
-//                        int idRoute = response.getInt("idRoute");
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                        idRoute[0] = response.getInt("id");
+                        Log.d(" idRoute", String.valueOf(idRoute[0]));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 },
                 error -> {
                     Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
@@ -355,10 +372,72 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         };
         requestQueue.add(jsonObjReq);
 
+        Route route = new Route(idRoute[0],
+                ret.encodedRoute,
+                0f,
+                ret.lengthByFoot,
+                ret.lengthByBike,
+                ret.timeByFoot,
+                ret.timeByBike,
+                ret.city);
+
         Log.e("sendRoute", ret.toString());
+        Log.e("sendRoute", route.toString());
         Intent intent = new Intent(requireContext(), RoadActivity.class);
-        intent.putExtra("ROUTE", ret);
+        intent.putExtra("ROUTE", route);
         startActivity(intent);
+    }
+
+    private void routeToggleHandler(View view) {
+
+        boolean isFoot = lastPolyFoot.isVisible();
+        boolean isBike = lastPolyBike.isVisible();
+
+        final ColorStateList TINT_DISABLED = ColorStateList.valueOf(requireContext().getColor(android.R.color.darker_gray));
+        final ColorStateList TINT_FOOT = ColorStateList.valueOf(requireContext().getColor(R.color.routeFoot));
+        final ColorStateList TINT_BIKE = ColorStateList.valueOf(requireContext().getColor(R.color.routeBike));
+
+        ImageView footToogle = requireView().findViewById(R.id.walk_toggle);
+        ImageView bikeToogle = requireView().findViewById(R.id.bike_toggle);
+
+        switch (view.getId()) {
+            case R.id.walk_toggle:
+                if (!isFoot) {
+                    lastPolyFoot.setVisible(true);
+                    footVisible = true;
+                    footToogle.setImageTintList(TINT_FOOT);
+                } else if (isFoot && !isBike) {
+                    lastPolyFoot.setVisible(false);
+                    footVisible = false;
+                    footToogle.setImageTintList(TINT_DISABLED);
+                    lastPolyBike.setVisible(true);
+                    bikeVisible = true;
+                    bikeToogle.setImageTintList(TINT_BIKE);
+                } else if (isFoot && isBike) {
+                    lastPolyFoot.setVisible(false);
+                    footVisible = false;
+                    footToogle.setImageTintList(TINT_DISABLED);
+                }
+                break;
+            case R.id.bike_toggle:
+                if (!isBike) {
+                    lastPolyBike.setVisible(true);
+                    bikeVisible = true;
+                    bikeToogle.setImageTintList(TINT_BIKE);
+                } else if (isBike && !isFoot) {
+                    lastPolyBike.setVisible(false);
+                    bikeVisible = false;
+                    bikeToogle.setImageTintList(TINT_DISABLED);
+                    lastPolyFoot.setVisible(true);
+                    footVisible = true;
+                    footToogle.setImageTintList(TINT_FOOT);
+                } else if (isBike && isFoot) {
+                    lastPolyBike.setVisible(false);
+                    bikeVisible = false;
+                    bikeToogle.setImageTintList(TINT_DISABLED);
+                }
+                break;
+        }
     }
 
     private static class DirectionsGetTask
@@ -388,58 +467,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 return;
             }
             fragment.changeParameters(result);
-        }
-    }
-
-    private void routeToggleHandler(View view) {
-
-        boolean isFoot = lastPolyFoot.isVisible();
-        boolean isBike = lastPolyBike.isVisible();
-
-        final int TINT_DISABLED = requireContext().getColor(android.R.color.secondary_text_light);
-        final int TINT_FOOT = requireContext().getColor(R.color.routeFoot);
-        final int TINT_BIKE = requireContext().getColor(R.color.routeBike);
-
-        ImageView footToogle = requireView().findViewById(R.id.walk_toggle);
-        ImageView bikeToogle = requireView().findViewById(R.id.bike_toggle);
-
-        switch (view.getId()) {
-            case R.id.walk_toggle:
-                if (!isFoot) {
-                    lastPolyFoot.setVisible(true);
-                    footVisible = true;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_FOOT));
-                } else if (isFoot && !isBike) {
-                    lastPolyFoot.setVisible(false);
-                    footVisible = false;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
-                    lastPolyBike.setVisible(true);
-                    bikeVisible = true;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_BIKE));
-                } else if (isFoot && isBike) {
-                    lastPolyFoot.setVisible(false);
-                    footVisible = false;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
-                }
-                break;
-            case R.id.bike_toggle:
-                if (!isBike) {
-                    lastPolyBike.setVisible(true);
-                    bikeVisible = true;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_BIKE));
-                } else if (isBike && !isFoot) {
-                    lastPolyBike.setVisible(false);
-                    bikeVisible = false;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
-                    lastPolyFoot.setVisible(true);
-                    footVisible = true;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_FOOT));
-                } else if (isBike && isFoot) {
-                    lastPolyBike.setVisible(false);
-                    bikeVisible = false;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
-                }
-                break;
         }
     }
 }
