@@ -392,9 +392,9 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         boolean isFoot = lastPolyFoot.isVisible();
         boolean isBike = lastPolyBike.isVisible();
 
-        final int TINT_DISABLED = requireContext().getColor(android.R.color.secondary_text_light);
-        final int TINT_FOOT = requireContext().getColor(R.color.routeFoot);
-        final int TINT_BIKE = requireContext().getColor(R.color.routeBike);
+        final ColorStateList TINT_DISABLED = ColorStateList.valueOf(requireContext().getColor(android.R.color.darker_gray));
+        final ColorStateList TINT_FOOT = ColorStateList.valueOf(requireContext().getColor(R.color.routeFoot));
+        final ColorStateList TINT_BIKE = ColorStateList.valueOf(requireContext().getColor(R.color.routeBike));
 
         ImageView footToogle = requireView().findViewById(R.id.walk_toggle);
         ImageView bikeToogle = requireView().findViewById(R.id.bike_toggle);
@@ -404,36 +404,36 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 if (!isFoot) {
                     lastPolyFoot.setVisible(true);
                     footVisible = true;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_FOOT));
+                    footToogle.setImageTintList(TINT_FOOT);
                 } else if (isFoot && !isBike) {
                     lastPolyFoot.setVisible(false);
                     footVisible = false;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                    footToogle.setImageTintList(TINT_DISABLED);
                     lastPolyBike.setVisible(true);
                     bikeVisible = true;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_BIKE));
+                    bikeToogle.setImageTintList(TINT_BIKE);
                 } else if (isFoot && isBike) {
                     lastPolyFoot.setVisible(false);
                     footVisible = false;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                    footToogle.setImageTintList(TINT_DISABLED);
                 }
                 break;
             case R.id.bike_toggle:
                 if (!isBike) {
                     lastPolyBike.setVisible(true);
                     bikeVisible = true;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_BIKE));
+                    bikeToogle.setImageTintList(TINT_BIKE);
                 } else if (isBike && !isFoot) {
                     lastPolyBike.setVisible(false);
                     bikeVisible = false;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                    bikeToogle.setImageTintList(TINT_DISABLED);
                     lastPolyFoot.setVisible(true);
                     footVisible = true;
-                    footToogle.setImageTintList(ColorStateList.valueOf(TINT_FOOT));
+                    footToogle.setImageTintList(TINT_FOOT);
                 } else if (isBike && isFoot) {
                     lastPolyBike.setVisible(false);
                     bikeVisible = false;
-                    bikeToogle.setImageTintList(ColorStateList.valueOf(TINT_DISABLED));
+                    bikeToogle.setImageTintList(TINT_DISABLED);
                 }
                 break;
         }

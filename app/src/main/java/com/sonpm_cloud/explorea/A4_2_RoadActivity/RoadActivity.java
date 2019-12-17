@@ -118,7 +118,7 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         FragmentMap fragment = new FragmentMap(route);
         fragmentTransaction.replace(R.id.frameL, fragment).commit();
         findViewById(R.id.buttonStart).setOnClickListener(v ->
-                fragment.launchMap(APIDirectionsDAO.By.Bike));
+                fragment.launchMap());
 
 
         //

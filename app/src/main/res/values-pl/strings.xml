@@ -35,4 +35,7 @@
     <string name="distBikeTooLong">Dystans rowerem jest za duży (%1), maksymalny dystans to %2 metrów</string>
     <string name="pointCountTooSmall">Liczba punktów na trasie jest za mała (%1), minimum to  %2</string>
     <string name="pointCountTooBig">Liczba punktów na trasie jest za duża (%1), maksimum to %2</string>
+    <string name="select_nav_mthd">Metoda nawigacji</string>
+    <string name="nav_dialog_pos">Uruchom</string>
+    <string name="nav_dialog_neg">Anuluj</string>
 </resources>
