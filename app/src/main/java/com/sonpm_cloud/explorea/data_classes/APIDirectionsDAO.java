@@ -1,6 +1,7 @@
 package com.sonpm_cloud.explorea.data_classes;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -113,12 +114,18 @@ public class APIDirectionsDAO {
 
     public static String createGoogleNavigationURL(LatLng[] route, By what) {
         try {
-            if (route.length < 2 || route.length > 25) return null;
+            if (route.length < 2 || route.length > 25) {
+                Log.e("createGoogleNavURL", "length wrong " + route.length);
+                return null;
+            }
             StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1");//&dir_action=navigate");
 
             if (what == By.Foot) url.append("&travelmode=walking&waypoints=");
             else if (what == By.Bike) url.append("&travelmode=bicycling&waypoints=");
-            else return null;
+            else {
+                Log.e("createGoogleNavURL", "what unknown " + String.valueOf(what));
+                return null;
+            }
 
             for (int i = 0; i < route.length-1; i++) {
                 url.append(URLEncoder.encode((route[i].latitude + "," + route[i].longitude + "|"),
@@ -130,6 +137,7 @@ public class APIDirectionsDAO {
                             StandardCharsets.UTF_8.name()));
             return url.toString();
         } catch (UnsupportedEncodingException e) {
+            Log.e("createGoogleNavURL", "encoding wrong");
             return null;
         }
     }
