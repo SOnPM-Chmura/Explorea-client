@@ -85,11 +85,6 @@ public class FragmentMap
                 container,
                 false);
 
-        inflate.findViewById(R.id.walk_toggle).setOnClickListener(this::routeToggleHandler);
-        inflate.findViewById(R.id.bike_toggle).setOnClickListener(this::routeToggleHandler);
-        inflate.findViewById(R.id.walk_toggle);
-        inflate.findViewById(R.id.bike_toggle);
-
         return inflate;
     }
 
@@ -163,6 +158,8 @@ public class FragmentMap
             fragment.polylineBike = fragment.googleMap.addPolyline(result.first.second);
             fragment.requireView().findViewById(R.id.walk_toggle).setClickable(true);
             fragment.requireView().findViewById(R.id.bike_toggle).setClickable(true);
+            fragment.requireView().findViewById(R.id.walk_toggle).setOnClickListener(fragment::routeToggleHandler);
+            fragment.requireView().findViewById(R.id.bike_toggle).setOnClickListener(fragment::routeToggleHandler);
             ((ImageView) fragment.requireView().findViewById(R.id.walk_toggle))
                     .setImageTintList(ColorStateList.valueOf(fragment.requireContext().getColor(R.color.routeFoot)));
             ((ImageView) fragment.requireView().findViewById(R.id.bike_toggle))

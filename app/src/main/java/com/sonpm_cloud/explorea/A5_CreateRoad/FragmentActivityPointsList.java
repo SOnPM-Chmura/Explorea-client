@@ -62,8 +62,8 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     private Polyline lastPolyFoot;
     private Polyline lastPolyBike;
 
-    private boolean footVisible = true;
-    private boolean bikeVisible = true;
+    private boolean footVisible = false;
+    private boolean bikeVisible = false;
 
     private long lastCalculation;
     private int lastDistFoot;
@@ -78,9 +78,23 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         if (lastCalculation > route.queryTime) return;
         if (lastPolyFoot != null) {
             lastPolyFoot.remove();
+        } else {
+            footVisible = true;
+            requireView().findViewById(R.id.walk_toggle).setClickable(true);
+            ((ImageView) requireView().findViewById(R.id.walk_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(R.color.routeFoot)));
+            requireView().findViewById(R.id.walk_toggle)
+                    .setOnClickListener(this::routeToggleHandler);
         }
         if (lastPolyBike != null) {
             lastPolyBike.remove();
+        } else {
+            bikeVisible = true;
+            requireView().findViewById(R.id.bike_toggle).setClickable(true);
+            ((ImageView) requireView().findViewById(R.id.bike_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(R.color.routeBike)));
+            requireView().findViewById(R.id.bike_toggle)
+                   .setOnClickListener(this::routeToggleHandler);
         }
         PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
                 .color(requireContext().getColor(R.color.routeFoot));
@@ -124,9 +138,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 container,
                 false
         );
-
-        inflate.findViewById(R.id.walk_toggle).setOnClickListener(this::routeToggleHandler);
-        inflate.findViewById(R.id.bike_toggle).setOnClickListener(this::routeToggleHandler);
 
         return inflate;
     }
@@ -186,10 +197,13 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
         viewModel.getPoints().observe(this, _points -> {
 
-            if (_points.size() > 1 && _points.size() < 25)
+            if (_points.size() > 1 && _points.size() < 25) {
+                if (lastPolyFoot != null) lastPolyFoot.setColor(requireContext().getColor(android.R.color.darker_gray));
+                if (lastPolyBike != null) lastPolyBike.setColor(requireContext().getColor(android.R.color.darker_gray));
                 new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
                         .map(p -> p.first)
                         .toArray(LatLng[]::new));
+            }
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
@@ -357,36 +371,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         startActivity(intent);
     }
 
-    private static class DirectionsGetTask
-            extends AsyncTask<LatLng, Void, DirectionsRoute> {
-
-        FragmentActivityPointsList fragment;
-
-        DirectionsGetTask(FragmentActivityPointsList fragment) {
-            this.fragment = fragment;
-        }
-
-        @Override
-        protected DirectionsRoute doInBackground(LatLng... latLngs) {
-
-            return DirectionsCreatingStrategy
-                    .getRecommendedStrategy(latLngs, fragment.requireContext())
-                    .createDirectionsRoute();
-        }
-
-        @Override
-        protected void onPostExecute(DirectionsRoute result) {
-
-            if (result == null) {
-                Toast.makeText(fragment.requireContext(),
-                        fragment.getString(R.string.directions_null),
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-            fragment.changeParameters(result);
-        }
-    }
-
     private void routeToggleHandler(View view) {
 
         boolean isFoot = lastPolyFoot.isVisible();
@@ -436,6 +420,36 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                     bikeToogle.setImageTintList(TINT_DISABLED);
                 }
                 break;
+        }
+    }
+
+    private static class DirectionsGetTask
+            extends AsyncTask<LatLng, Void, DirectionsRoute> {
+
+        FragmentActivityPointsList fragment;
+
+        DirectionsGetTask(FragmentActivityPointsList fragment) {
+            this.fragment = fragment;
+        }
+
+        @Override
+        protected DirectionsRoute doInBackground(LatLng... latLngs) {
+
+            return DirectionsCreatingStrategy
+                    .getRecommendedStrategy(latLngs, fragment.requireContext())
+                    .createDirectionsRoute();
+        }
+
+        @Override
+        protected void onPostExecute(DirectionsRoute result) {
+
+            if (result == null) {
+                Toast.makeText(fragment.requireContext(),
+                               fragment.getString(R.string.directions_null),
+                               Toast.LENGTH_LONG).show();
+                return;
+            }
+            fragment.changeParameters(result);
         }
     }
 }
