@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,9 +8,53 @@
     android:orientation="vertical"
     tools:context=".A4_2_RoadActivity.FragmentMap">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/map_view3"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map_view3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="112dp"
+            android:layout_height="56dp"
+            android:background="@drawable/sh_left_corner_round"
+            app:layout_constraintEnd_toEndOf="@+id/map_view3"
+            app:layout_constraintTop_toTopOf="@+id/map_view3">
+
+            <ImageView
+                android:id="@+id/walk_toggle"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_directions_walk_black_24dp"
+                android:tint="@color/routeFoot"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/bike_toggle"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/bike_toggle"
+                style="@style/Widget.AppCompat.ActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_directions_bike_black_24dp"
+                android:tint="@color/routeBike"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/walk_toggle"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

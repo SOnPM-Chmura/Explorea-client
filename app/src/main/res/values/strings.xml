@@ -28,7 +28,10 @@
     <string name="welcome_to_explorea">Welcome to Explorea</string>
     <string name="rate">RATE</string>
     <string name="directions_null">Could not create directions for this route</string>
+    <string name="distFootTooShort">Distance by foot is too short (%1), minimal is %2 meters</string>
     <string name="distFootTooLong">Distance by foot is too long (%1), maximal is %2 meters</string>
+    <string name="distBikeTooShort">Distance by bike is too short (%1), maximal is %2 meters</string>
     <string name="distBikeTooLong">Distance by bike is too long (%1), maximal is %2 meters</string>
+    <string name="pointCountTooSmall">Number of points in route is too small (%1), minimal is %2</string>
     <string name="pointCountTooBig">Number of points in route is too big (%1), maximal is %2</string>
 </resources>
