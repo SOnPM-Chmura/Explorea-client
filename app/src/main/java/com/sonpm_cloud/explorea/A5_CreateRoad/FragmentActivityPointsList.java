@@ -72,10 +72,9 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     private int lastTimeBike;
     private String lastCity;
 
-    @SuppressLint("NewApi")
     private synchronized void changeParameters(DirectionsRoute route) {
         if (googleMap == null) return;
-        if (lastCalculation > route.queryTime) return;
+//        if (lastCalculation > route.queryTime) return;
         if (lastPolyFoot != null) {
             lastPolyFoot.remove();
         } else {
