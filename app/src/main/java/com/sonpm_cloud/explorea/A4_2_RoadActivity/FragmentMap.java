@@ -95,7 +95,7 @@ public class FragmentMap
         if (isFoot && !isBike) whatParam = APIDirectionsDAO.By.Foot;
         if (!isFoot && isBike) whatParam = APIDirectionsDAO.By.Bike;
         GoogleNavigationLaunchDialog.newInstance(whatParam, route.encodedRoute)
-                                    .show(requireActivity().getSupportFragmentManager(), "NAV_LAUNCHER");
+                .show(requireActivity().getSupportFragmentManager(), "NAV_LAUNCHER");
     }
 
     @Override

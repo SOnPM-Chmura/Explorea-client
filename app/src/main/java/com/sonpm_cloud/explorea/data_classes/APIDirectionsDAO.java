@@ -22,7 +22,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -119,7 +118,7 @@ public class APIDirectionsDAO {
                 Log.e("createGoogleNavURL", "length wrong " + route.length);
                 return null;
             }
-            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1");
+            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1");//&dir_action=navigate");
 
             if (what == By.Foot) url.append("&travelmode=walking&waypoints=");
             else if (what == By.Bike) url.append("&travelmode=bicycling&waypoints=");

@@ -1,6 +1,5 @@
 package com.sonpm_cloud.explorea.A5_CreateRoad;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -44,6 +43,7 @@ import com.sonpm_cloud.explorea.data_classes.U;
 import com.sonpm_cloud.explorea.maps.AbstractGoogleMapContainerFragment;
 import com.sonpm_cloud.explorea.maps.route_creating.DirectionsCreatingStrategy;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -74,7 +74,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
     private synchronized void changeParameters(DirectionsRoute route) {
         if (googleMap == null) return;
-//        if (lastCalculation > route.queryTime) return;
+        //if (lastCalculation > route.queryTime) return;
         if (lastPolyFoot != null) {
             lastPolyFoot.remove();
         } else {
@@ -93,7 +93,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
             ((ImageView) requireView().findViewById(R.id.bike_toggle))
                     .setImageTintList(ColorStateList.valueOf(requireContext().getColor(R.color.routeBike)));
             requireView().findViewById(R.id.bike_toggle)
-                   .setOnClickListener(this::routeToggleHandler);
+                    .setOnClickListener(this::routeToggleHandler);
         }
         PolylineOptions newFoot = new PolylineOptions().addAll(PolyUtil.decode(route.encodedDirectionsByFoot))
                 .color(requireContext().getColor(R.color.routeFoot));
@@ -197,8 +197,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         viewModel.getPoints().observe(this, _points -> {
 
             if (_points.size() > 1 && _points.size() < 25) {
-                if (lastPolyFoot != null) lastPolyFoot.setColor(requireContext().getColor(android.R.color.darker_gray));
-                if (lastPolyBike != null) lastPolyBike.setColor(requireContext().getColor(android.R.color.darker_gray));
+                if (lastPolyFoot != null)
+                    lastPolyFoot.setColor(requireContext().getColor(android.R.color.darker_gray));
+                if (lastPolyBike != null)
+                    lastPolyBike.setColor(requireContext().getColor(android.R.color.darker_gray));
                 new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
                         .map(p -> p.first)
                         .toArray(LatLng[]::new));
@@ -262,7 +264,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
     }
 
     private void sendRoute(View view) {
-
         final int DIST_FOOT_MIN = 0;
         final int DIST_FOOT_MAX = 10000;
         final int DIST_BIKE_MIN = 0;
@@ -273,10 +274,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
         if (lastDistFoot < DIST_FOOT_MIN) {
             Toast.makeText(requireContext(),
-                           getString(R.string.distFootTooShort)
-                                   .replaceAll("%1", String.valueOf(lastDistFoot))
-                                   .replaceAll("%2", String.valueOf(DIST_FOOT_MIN)),
-                           Toast.LENGTH_LONG).show();
+                    getString(R.string.distFootTooShort)
+                            .replaceAll("%1", String.valueOf(lastDistFoot))
+                            .replaceAll("%2", String.valueOf(DIST_FOOT_MIN)),
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (lastDistFoot > DIST_FOOT_MAX) {
@@ -289,10 +290,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         }
         if (lastDistBike < DIST_BIKE_MIN) {
             Toast.makeText(requireContext(),
-                           getString(R.string.distBikeTooShort)
-                                   .replaceAll("%1", String.valueOf(lastDistBike))
-                                   .replaceAll("%2", String.valueOf(DIST_BIKE_MIN)),
-                           Toast.LENGTH_LONG).show();
+                    getString(R.string.distBikeTooShort)
+                            .replaceAll("%1", String.valueOf(lastDistBike))
+                            .replaceAll("%2", String.valueOf(DIST_BIKE_MIN)),
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (lastDistBike > DIST_BIKE_MAX) {
@@ -305,10 +306,10 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         }
         if (markers.size() < SIZE_POINT_MIN) {
             Toast.makeText(requireContext(),
-                           getString(R.string.pointCountTooSmall)
-                                   .replaceAll("%1", String.valueOf(markers.size()))
-                                   .replaceAll("%2", String.valueOf(SIZE_POINT_MIN)),
-                           Toast.LENGTH_LONG).show();
+                    getString(R.string.pointCountTooSmall)
+                            .replaceAll("%1", String.valueOf(markers.size()))
+                            .replaceAll("%2", String.valueOf(SIZE_POINT_MIN)),
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (markers.size() > SIZE_POINT_MAX) {
@@ -334,18 +335,39 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         Context context = getContext();
         Map<String, String> params = new HashMap<>();
         params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
-        params.put("lengthByFoot", String.valueOf(ret.timeByFoot));
+        params.put("lengthByFoot", String.valueOf(ret.lengthByFoot));
         params.put("lengthByBike", String.valueOf(ret.lengthByBike));
         params.put("timeByFoot", String.valueOf(ret.timeByFoot));
         params.put("timeByBike", String.valueOf(ret.timeByBike));
-        params.put("city", "Łodź");//String.valueOf(ret.city));
+        params.put("city", ret.city);
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(
                 Request.Method.POST,
                 url + "/routes",
                 new JSONObject(params),
                 response -> {
-//                    Log.d(" RESPONSE JSONPost", response.toString());
-                    Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+                    try {
+                        Log.d(" RESPONSE JSONPost", response.toString());
+                        Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+                        int idRoute = response.getInt("id");
+                        Log.d(" idRoute", String.valueOf(idRoute));
+                        Route route  = new Route(idRoute,
+                                ret.encodedRoute,
+                                0f,
+                                ret.lengthByFoot,
+                                ret.lengthByBike,
+                                ret.timeByFoot,
+                                ret.timeByBike,
+                                ret.city);
+
+                        Log.e("sendRoute", ret.toString());
+                        Log.e("sendRoute", route.toString());
+                        Intent intent = new Intent(requireContext(), RoadActivity.class);
+                        intent.putExtra("ROUTE", route);
+                        startActivity(intent);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 },
                 error -> {
                     Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
@@ -364,10 +386,21 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         };
         requestQueue.add(jsonObjReq);
 
-        Log.e("sendRoute", ret.toString());
-        Intent intent = new Intent(requireContext(), RoadActivity.class);
-        intent.putExtra("ROUTE", ret);
-        startActivity(intent);
+//        Route route = new Route(idRoute[0],
+//                ret.encodedRoute,
+//                0f,
+//                ret.lengthByFoot,
+//                ret.lengthByBike,
+//                ret.timeByFoot,
+//                ret.timeByBike,
+//                ret.city);
+
+
+//        Log.e("sendRoute", ret.toString());
+//        Log.e("sendRoute", route[0].toString());
+//        Intent intent = new Intent(requireContext(), RoadActivity.class);
+//        intent.putExtra("ROUTE", route[0]);
+//        startActivity(intent);
     }
 
     private void routeToggleHandler(View view) {
@@ -444,8 +477,8 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
 
             if (result == null) {
                 Toast.makeText(fragment.requireContext(),
-                               fragment.getString(R.string.directions_null),
-                               Toast.LENGTH_LONG).show();
+                        fragment.getString(R.string.directions_null),
+                        Toast.LENGTH_LONG).show();
                 return;
             }
             fragment.changeParameters(result);
