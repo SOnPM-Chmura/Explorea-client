@@ -332,7 +332,6 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 lastTimeBike,
                 lastCity);
 
-        final int[] idRoute = new int[1];
         Context context = getContext();
         Map<String, String> params = new HashMap<>();
         params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
@@ -349,8 +348,23 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                     try {
                         Log.d(" RESPONSE JSONPost", response.toString());
                         Log.d(" RESPONSE JSONPost", "DODANO TRASE");
-                        idRoute[0] = response.getInt("id");
-                        Log.d(" idRoute", String.valueOf(idRoute[0]));
+                        int idRoute = response.getInt("id");
+                        Log.d(" idRoute", String.valueOf(idRoute));
+                        Route route  = new Route(idRoute,
+                                ret.encodedRoute,
+                                0f,
+                                ret.lengthByFoot,
+                                ret.lengthByBike,
+                                ret.timeByFoot,
+                                ret.timeByBike,
+                                ret.city);
+
+                        Log.e("sendRoute", ret.toString());
+                        Log.e("sendRoute", route.toString());
+                        Intent intent = new Intent(requireContext(), RoadActivity.class);
+                        intent.putExtra("ROUTE", route);
+                        startActivity(intent);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -372,20 +386,21 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         };
         requestQueue.add(jsonObjReq);
 
-        Route route = new Route(idRoute[0],
-                ret.encodedRoute,
-                0f,
-                ret.lengthByFoot,
-                ret.lengthByBike,
-                ret.timeByFoot,
-                ret.timeByBike,
-                ret.city);
+//        Route route = new Route(idRoute[0],
+//                ret.encodedRoute,
+//                0f,
+//                ret.lengthByFoot,
+//                ret.lengthByBike,
+//                ret.timeByFoot,
+//                ret.timeByBike,
+//                ret.city);
 
-        Log.e("sendRoute", ret.toString());
-        Log.e("sendRoute", route.toString());
-        Intent intent = new Intent(requireContext(), RoadActivity.class);
-        intent.putExtra("ROUTE", route);
-        startActivity(intent);
+
+//        Log.e("sendRoute", ret.toString());
+//        Log.e("sendRoute", route[0].toString());
+//        Intent intent = new Intent(requireContext(), RoadActivity.class);
+//        intent.putExtra("ROUTE", route[0]);
+//        startActivity(intent);
     }
 
     private void routeToggleHandler(View view) {
