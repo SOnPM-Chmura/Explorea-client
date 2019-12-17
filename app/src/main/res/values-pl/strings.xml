@@ -29,7 +29,11 @@
     <string name="welcome_to_explorea">Witaj w Explorea</string>
     <string name="rate">Oceń</string>
     <string name="directions_null">Nie udało się wyznaczyć trasy dla tych punktów</string>
+    <string name="distFootTooShort">Dystans na pieszo jest za mały (%1), minimalny dystans to %2 metrów</string>
     <string name="distFootTooLong">Dystans na pieszo jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="distBikeTooShort">Dystans rowerem jest za mały (%1), minimalny dystans to %2 metrów</string>
     <string name="distBikeTooLong">Dystans rowerem jest za duży (%1), maksymalny dystans to %2 metrów</string>
-    <string name="pointCountTooBig">Liczba punltów na trasie (%1), maksimum to %2</string>
+    <string name="pointCountTooSmall">Liczba punktów na trasie jest za mała (%1), minimum to  %2</string>
+    <string name="pointCountTooBig">Liczba punktów na trasie jest za duża (%1), maksimum to %2</string>
+    <string name="add_city_name">Podaj miasto!</string>
 </resources>

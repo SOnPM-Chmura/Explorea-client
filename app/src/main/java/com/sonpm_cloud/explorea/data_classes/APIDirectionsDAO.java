@@ -1,9 +1,6 @@
 package com.sonpm_cloud.explorea.data_classes;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -39,20 +35,19 @@ public class APIDirectionsDAO {
     @WorkerThread
     public DirectionsRoute getDRorNull(final Route route) {
         return getDRorNull(PolyUtil.decode(route.encodedRoute).toArray(new LatLng[0]),
-                route.id, route.avgRating, route.city);
+                route.id, route.avgRating);
     }
 
     @Nullable
     @WorkerThread
     public DirectionsRoute getDRorNull(final LatLng[] points) {
-        return getDRorNull(points, null, null, null);
+        return getDRorNull(points, null, null);
     }
 
     @WorkerThread
     private DirectionsRoute getDRorNull(@NonNull LatLng[] route,
                                         @Nullable Long id,
-                                        @Nullable Float avgRating,
-                                        @Nullable String city) {
+                                        @Nullable Float avgRating) {
 
         String url = createAPIDirectionsURL(route);
 
@@ -79,6 +74,7 @@ public class APIDirectionsDAO {
             double ne_lng = response.getJSONObject("bounds").getJSONObject("northEast").getDouble("lng");
             double sw_lat = response.getJSONObject("bounds").getJSONObject("southWest").getDouble("lat");
             double sw_lng = response.getJSONObject("bounds").getJSONObject("southWest").getDouble("lng");
+            String city = response.getString("city");
             LatLngBounds bounds = LatLngBounds.builder()
                     .include(new LatLng(ne_lat, ne_lng))
                     .include(new LatLng(sw_lat, sw_lng))
@@ -95,23 +91,12 @@ public class APIDirectionsDAO {
                     distanceBike,
                     timeFoot,
                     timeBike,
-                    city == null ? "" : city,
+                    city,
                     bounds
             );
 
         } catch (InterruptedException | TimeoutException | ExecutionException | JSONException e) {
             return null;
-        }
-    }
-
-    private String getApiKey() {
-        try {
-            ApplicationInfo appInf = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-                    PackageManager.GET_META_DATA);
-            Bundle meta = appInf.metaData;
-            return meta.getString("com.google.android.geo.API_KEY");
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new NoSuchElementException("API Key may not be present");
         }
     }
 
@@ -129,10 +114,10 @@ public class APIDirectionsDAO {
     public static String createGoogleNavigationURL(LatLng[] route, By what) {
         try {
             if (route.length < 2 || route.length > 25) return null;
-            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1&dir_action=navigate");
+            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1");//&dir_action=navigate");
 
             if (what == By.Foot) url.append("&travelmode=walking&waypoints=");
-            else if (what == By.Bike) url.append("&travelmode=walking&waypoints=");
+            else if (what == By.Bike) url.append("&travelmode=bicycling&waypoints=");
             else return null;
 
             for (int i = 0; i < route.length-1; i++) {
