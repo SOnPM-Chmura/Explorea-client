@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity3_main_roadlist);
 
+        requestQueue =  Volley.newRequestQueue(this);
+
         connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         connected = connectivityManager.getActiveNetworkInfo() != null
@@ -72,14 +74,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Log.d("TOKEN ", LoginActivity.account.getIdToken());
+            sendAddUser();
 
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
             linearLayoutForRoads = findViewById(R.id.RoadButtonList);
-            requestQueue =  Volley.newRequestQueue(this);
 
-            sendAddUser();
         }
         else {
             Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
@@ -196,8 +197,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 },
                 error -> {
+                    if (!connected){
+                        Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                                .show();
+                    }else
                         Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-                        .show();
+                                .show();
                         Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
                         Log.w(TAG, "request response:failed msg=" + error.getMessage());
                 }
@@ -221,10 +226,14 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 response -> {
 //                    Log.d(" RESPONSE JSONPost", response.toString());
-                    Log.d(" RESPONSE JSONPost", "DODANO");
+                    Log.d(" RESPONSE JSONPost", "ADD USER");
                 },
                 error -> {
-                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                    if (!connected){
+                        Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                                .show();
+                    }else
+                        Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
                             .show();
                     Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
                     Log.w(TAG, "request response:failed msg=" + error.getMessage());
@@ -254,126 +263,3 @@ public class MainActivity extends AppCompatActivity {
                     .show();
     }
 }
-
-//        StringRequest postRequest = new StringRequest(
-//                Request.Method.POST,
-//                url + "/users",
-//                response -> {
-//                    Log.d("RESPONSE", response);
-//                },
-//                error -> {
-//                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-//                            .show();
-//                    Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
-//                    Log.w(TAG, "request response:failed msg=" + error.getMessage());
-//                }
-//        ) {
-//            /** Passing some request headers* */
-//            @Override
-//            public Map getHeaders() {
-//                HashMap headers = new HashMap();
-//                headers.put("authorization", "Bearer " + token);
-//                return headers;
-//            }
-//        };
-//        requestQueue.add(postRequest);
-
-//    private void sendRequestForUsers(String userId, String activityName){
-//        Context context = this;
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-//                Request.Method.GET,
-//                url + "/users/" + userId,
-//                null,
-//                response -> {
-//                    try {
-//
-//                        Log.d("jsonObject", response.toString());
-//                        createdRoutes = response.getString("createdRoutes").split("_");
-//                        favoriteRoutes = response.getString("favoriteRoutes").split("_");
-//                        Log.d("EXTRA createdRoutes", Arrays.toString(createdRoutes));
-//                        Log.d("EXTRA favoriteRoutes", Arrays.toString(favoriteRoutes));
-//
-//                        Log.d("TOKEN ", token);
-//                        if (activityName.equals("MyRoadActivity")){
-//                            Intent intent = new Intent(this, MyRoadActivity.class);
-//                            intent.putExtra("createdRoutes", createdRoutes);
-//                            intent.putExtra("token", token);
-//                            startActivity(intent);
-//                        } else if (activityName.equals("FavouriteRoadActivity")){
-//                            Intent intent = new Intent(this, FavouriteRoadActivity.class);
-//                            intent.putExtra("favoriteRoutes", favoriteRoutes);
-//                            intent.putExtra("token", token);
-//                            startActivity(intent);
-//                        }
-//
-//                    }catch (Exception e) {
-//                        e.printStackTrace();
-//                        Log.w(TAG, "request response:failed message=" + e.getMessage());
-//                    }
-//                },
-//                error -> {
-//                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-//                            .show();
-//                    Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
-//                    Log.w(TAG, "request response:failed msg=" + error.getMessage());
-//                }
-//        ) {
-//            /** Passing some request headers* */
-//            @Override
-//            public Map getHeaders() throws AuthFailureError {
-//                HashMap headers = new HashMap();
-//                headers.put("authorization", "Bearer " + token);
-//                return headers;
-//            }
-//        };
-//        requestQueue.add(jsonObjectRequest);
-//    }
-
-
-/////////////////////////////////////////////
-//    private void setButtonsForRoads(){
-
-//        sendRequest();
-//        try {
-//            wait(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        Thread.currentThread().getName();
-//        Thread.activeCount()
-
-//        int sleepTime = 200;
-//        int counter = 0;
-//        int timeout = 15000;
-//        while(routes.size() == 0){
-//            try {
-//                if(counter > timeout){
-//                    throw new Exception("Exception with response");
-//                }
-//                else {
-//                    counter += sleepTime;
-//                    Thread.sleep(sleepTime);
-//                }
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-
-//        for (int i = 0; i < 5; i++) {
-//            Button btnShow = new Button(this);
-//            btnShow.setText("TRASA");
-//            btnShow.setId(i);
-//            btnShow.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//            btnShow.setOnClickListener(v -> startActivity(new Intent(v.getContext(), RoadActivity.class)));
-//
-//            // Add Button to LinearLayout
-//            if (linearLayoutForRoads != null) {
-//                Log.d("@", "HERE");
-//                linearLayoutForRoads.addView(btnShow);
-//            }
-//        }
-//    }
-
-

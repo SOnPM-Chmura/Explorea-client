@@ -1,9 +1,6 @@
 package com.sonpm_cloud.explorea.data_classes;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -118,7 +114,7 @@ public class APIDirectionsDAO {
     public static String createGoogleNavigationURL(LatLng[] route, By what) {
         try {
             if (route.length < 2 || route.length > 25) return null;
-            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1&dir_action=navigate");
+            StringBuilder url = new StringBuilder("https://www.google.pl/maps/dir/?api=1");//&dir_action=navigate");
 
             if (what == By.Foot) url.append("&travelmode=walking&waypoints=");
             else if (what == By.Bike) url.append("&travelmode=bicycling&waypoints=");
