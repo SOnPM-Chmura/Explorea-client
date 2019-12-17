@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Explorea</string>
+    <string name="login_text">Logowanie</string>
+    <string name="logout_button">Wyloguj</string>
+    <string name="_WIP_send_request">Wyślij zapytanie do serwera</string>
+    <string name="request_error_response_msg">Błąd w trakcie łączenia z serwerem</string>
+    <string name="no_network_connection">Brak połączenia z internetem</string>
+    <string name="empty_creaded_route_msg">Nie utworzyłeś żadnych tras</string>
+    <string name="empty_favorite_route_msg">Nie masz żadnych ulubionych tras</string>
+    <string name="search_track">Wyszukiwanie tras</string>
+    <string name="create_track">Stwórz trase</string>
+    <string name="mine_tracks">Moje trasy</string>
+    <string name="favourite_track">Ulubione trasy</string>
+    <string name="create_road">STWÓRZ TRASE</string>
+    <string name="search_road">SZUKAJ TRASY</string>
+    <string name="start">START!</string>
+    <string name="default_sort">sortowanie domyślne</string>
+    <string name="search">SZUKAJ</string>
+    <string name="city">Miasto</string>
+    <string name="time_for_road">Czas przejazdu</string>
+    <string name="mode_of_transportation">Środek transportu</string>
+    <string name="add_road">Dodaj trasę</string>
+    <string name="favourite_road">Ulubione trasy</string>
+    <string name="my_road">Moje trasy</string>
+    <string name="select_points">Wybierz punkty</string>
+    <string name="order_points">Wybierz kolejność</string>
+    <string name="routes_found">Znalezione trasy</string>
+    <string name="welcome_to_explorea">Witaj w Explorea</string>
+    <string name="rate">Oceń</string>
+    <string name="directions_null">Nie udało się wyznaczyć trasy dla tych punktów</string>
+    <string name="distFootTooShort">Dystans na pieszo jest za mały (%1), minimalny dystans to %2 metrów</string>
+    <string name="distFootTooLong">Dystans na pieszo jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="distBikeTooShort">Dystans rowerem jest za mały (%1), minimalny dystans to %2 metrów</string>
+    <string name="distBikeTooLong">Dystans rowerem jest za duży (%1), maksymalny dystans to %2 metrów</string>
+    <string name="pointCountTooSmall">Liczba punktów na trasie jest za mała (%1), minimum to  %2</string>
+    <string name="pointCountTooBig">Liczba punktów na trasie jest za duża (%1), maksimum to %2</string>
+    <string name="add_city_name">Podaj miasto!</string>
+    <string name="select_nav_mthd">Metoda nawigacji</string>
+    <string name="nav_dialog_pos">Uruchom</string>
+    <string name="nav_dialog_neg">Anuluj</string>
+</resources>
