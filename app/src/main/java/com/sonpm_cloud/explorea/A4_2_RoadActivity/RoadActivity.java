@@ -96,7 +96,6 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         fragmentTransaction.replace(R.id.frameL, fragment).commit();
         findViewById(R.id.buttonStart).setOnClickListener(v ->
                 fragment.launchMap());
-
     }
 
     @Override
