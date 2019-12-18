@@ -112,6 +112,29 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 (int) U.dp_px(32, requireContext())));
     }
 
+    private void disablePolys() {
+        if (lastPolyFoot != null) {
+            lastPolyFoot.remove();
+            lastPolyFoot = null;
+            footVisible = false;
+            ((ImageView) requireView().findViewById(R.id.walk_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(android.R.color.darker_gray)));
+            requireView().findViewById(R.id.walk_toggle)
+                         .setOnClickListener(null);
+            requireView().findViewById(R.id.walk_toggle).setClickable(false);
+        }
+        if (lastPolyBike != null) {
+            lastPolyBike.remove();
+            lastPolyBike = null;
+            bikeVisible = false;
+            ((ImageView) requireView().findViewById(R.id.bike_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(android.R.color.darker_gray)));
+            requireView().findViewById(R.id.bike_toggle)
+                         .setOnClickListener(null);
+            requireView().findViewById(R.id.bike_toggle).setClickable(false);
+        }
+    }
+
     private FragmentViewModel viewModel;
 
     private GoogleMap googleMap;
@@ -203,7 +226,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
                         .map(p -> p.first)
                         .toArray(LatLng[]::new));
-            }
+            } else disablePolys();
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
