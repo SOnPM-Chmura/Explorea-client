@@ -25,12 +25,18 @@
         <meta-data android:name="com.sonpm_cloud.explorea.api.WEB_ID"
             android:value="685250076671-v2uk6ii19acgok6n2fa8jmog7uqsfamq.apps.googleusercontent.com" />
 
-        <activity android:name=".A2_Login.LoginActivity" />
-        <activity android:name=".A4_SearchRoad.SearchRoadActivity" />
-        <activity android:name=".A5_CreateRoad.CreateRoadActivity" />
-        <activity android:name=".A6_FavouriteRoad.FavouriteRoadActivity" />
-        <activity android:name=".A7_MyRoad.MyRoadActivity" />
-        <activity android:name=".A4_2_RoadActivity.RoadActivity" />
+        <activity android:name=".A2_Login.LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".A4_SearchRoad.SearchRoadActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".A5_CreateRoad.CreateRoadActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".A6_FavouriteRoad.FavouriteRoadActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".A7_MyRoad.MyRoadActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".A4_2_RoadActivity.RoadActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"
