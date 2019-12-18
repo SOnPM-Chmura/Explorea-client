@@ -30,7 +30,7 @@ import org.json.JSONObject;
 
 public class SearchRoadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private static final String TAG = "TAG";
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
     private boolean connected;

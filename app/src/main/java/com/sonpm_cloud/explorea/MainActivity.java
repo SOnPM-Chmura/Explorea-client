@@ -38,7 +38,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private static final String TAG = "TAG";
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
     private LinearLayout linearLayoutForRoads;
@@ -71,10 +71,12 @@ public class MainActivity extends AppCompatActivity {
             LoginActivity.account = GoogleSignIn.getLastSignedInAccount(this);
             if (LoginActivity.account == null) {
                 launchLoginActivity();
+                finish();
+                return;
             }
 
             Log.d("TOKEN ", LoginActivity.account.getIdToken());
-            sendAddUser();
+            LoginActivity.silentSignIn(this, this::sendAddUser, "MainActivity");
 
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         LoginActivity.mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             LoginActivity.account = null;
             launchLoginActivity();
+            finish();
         });
     }
 
@@ -225,7 +228,8 @@ public class MainActivity extends AppCompatActivity {
                 url + "/users",
                 null,
                 response -> {
-//                    Log.d(" RESPONSE JSONPost", response.toString());
+//                    if (response != null)
+//                      Log.d(" RESPONSE JSONPost", response.toString());
                     Log.d(" RESPONSE JSONPost", "ADD USER");
                 },
                 error -> {
@@ -256,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         Context context = this;
         if (connected) {
             //we are connected to a network
-            sendGetRoutes();
+            LoginActivity.silentSignIn(this, this::sendGetRoutes, "MainActivity");
         }
         else
             Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)

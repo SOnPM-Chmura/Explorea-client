@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class MyRoadActivity extends AppCompatActivity {
 
-    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private static final String TAG = "TAG";
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
     private LinearLayout linearLayoutForRoads;
@@ -75,6 +75,7 @@ public class MyRoadActivity extends AppCompatActivity {
 
     private void sendGetCreatedRoutes() {
         Context context = this;
+        linearLayoutForRoads.removeAllViews();
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(
                     Request.Method.GET,
                     url + "/routes/created",

@@ -49,9 +49,6 @@ public class FragmentMap
     private String getMapViewBundleKey() { return "MapViewBundleKey3"; }
     private int getMapViewId() { return R.id.map_view3; }
 
-//    private FragmentMap() {}
-
-    // Force using non-default constructor
     public FragmentMap() { requireActivity().finish(); }
 
     public FragmentMap(@NonNull Route route) {

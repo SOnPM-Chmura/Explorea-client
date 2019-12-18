@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class FavouriteRoadActivity extends AppCompatActivity {
 
-    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private static final String TAG = "TAG";
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
     private LinearLayout linearLayoutForRoads;
@@ -68,7 +68,7 @@ public class FavouriteRoadActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (connected)
-            sendGetFavouriteRoutes();
+            LoginActivity.silentSignIn(this, this::sendGetFavouriteRoutes, "FavouriteRoadActivity");
         else
             Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
                     .show();

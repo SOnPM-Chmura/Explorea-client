@@ -55,7 +55,7 @@ import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragment {
-    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private static final String TAG = "TAG";
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
 
@@ -111,6 +111,29 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
         lastCity = route.city;
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(route.bounds,
                 (int) U.dp_px(32, requireContext())));
+    }
+
+    private void disablePolys() {
+        if (lastPolyFoot != null) {
+            lastPolyFoot.remove();
+            lastPolyFoot = null;
+            footVisible = false;
+            ((ImageView) requireView().findViewById(R.id.walk_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(android.R.color.darker_gray)));
+            requireView().findViewById(R.id.walk_toggle)
+                    .setOnClickListener(null);
+            requireView().findViewById(R.id.walk_toggle).setClickable(false);
+        }
+        if (lastPolyBike != null) {
+            lastPolyBike.remove();
+            lastPolyBike = null;
+            bikeVisible = false;
+            ((ImageView) requireView().findViewById(R.id.bike_toggle))
+                    .setImageTintList(ColorStateList.valueOf(requireContext().getColor(android.R.color.darker_gray)));
+            requireView().findViewById(R.id.bike_toggle)
+                    .setOnClickListener(null);
+            requireView().findViewById(R.id.bike_toggle).setClickable(false);
+        }
     }
 
     private FragmentViewModel viewModel;
@@ -204,7 +227,7 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 new DirectionsGetTask(this).execute(StreamSupport.stream(viewModel.getListPoints())
                         .map(p -> p.first)
                         .toArray(LatLng[]::new));
-            }
+            } else disablePolys();
 
             List<LatLng> toRemove = new LinkedList<>(markers.values());
             List<LatLng> toAdd = StreamSupport.stream(_points).map(p -> p.first)
@@ -332,60 +355,62 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 lastTimeBike,
                 lastCity);
 
-        final int[] idRoute = new int[1];
         Context context = getContext();
-        Map<String, String> params = new HashMap<>();
-        params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
-        params.put("lengthByFoot", String.valueOf(ret.lengthByFoot));
-        params.put("lengthByBike", String.valueOf(ret.lengthByBike));
-        params.put("timeByFoot", String.valueOf(ret.timeByFoot));
-        params.put("timeByBike", String.valueOf(ret.timeByBike));
-        params.put("city", ret.city);
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(
-                Request.Method.POST,
-                url + "/routes",
-                new JSONObject(params),
-                response -> {
-                    try {
-                        Log.d(" RESPONSE JSONPost", response.toString());
-                        Log.d(" RESPONSE JSONPost", "DODANO TRASE");
-                        idRoute[0] = response.getInt("id");
-                        Log.d(" idRoute", String.valueOf(idRoute[0]));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+        LoginActivity.silentSignIn(context, () -> {
+            Map<String, String> params = new HashMap<>();
+            params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
+            params.put("lengthByFoot", String.valueOf(ret.lengthByFoot));
+            params.put("lengthByBike", String.valueOf(ret.lengthByBike));
+            params.put("timeByFoot", String.valueOf(ret.timeByFoot));
+            params.put("timeByBike", String.valueOf(ret.timeByBike));
+            params.put("city", ret.city);
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(
+                    Request.Method.POST,
+                    url + "/routes",
+                    new JSONObject(params),
+                    response -> {
+                        try {
+                            Log.d(" RESPONSE JSONPost", response.toString());
+                            Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+                            int idRoute = response.getInt("id");
+                            Log.d(" idRoute", String.valueOf(idRoute));
+                            Route route  = new Route(idRoute,
+                                    ret.encodedRoute,
+                                    0f,
+                                    ret.lengthByFoot,
+                                    ret.lengthByBike,
+                                    ret.timeByFoot,
+                                    ret.timeByBike,
+                                    ret.city);
+
+                            Log.e("sendRoute", ret.toString());
+                            Log.e("sendRoute", route.toString());
+                            Intent intent = new Intent(requireContext(), RoadActivity.class);
+                            intent.putExtra("ROUTE", route);
+                            startActivity(intent);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    error -> {
+                        Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                                .show();
+                        Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
+                        Log.w(TAG, "request response:failed msg=" + error.getMessage());
                     }
-                },
-                error -> {
-                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-                            .show();
-                    Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
-                    Log.w(TAG, "request response:failed msg=" + error.getMessage());
+            ) {
+                /** Passing some request headers* */
+                @Override
+                public Map getHeaders() {
+                    HashMap headers = new HashMap();
+                    headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
+                    return headers;
                 }
-        ) {
-            /** Passing some request headers* */
-            @Override
-            public Map getHeaders() {
-                HashMap headers = new HashMap();
-                headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
-                return headers;
-            }
-        };
-        requestQueue.add(jsonObjReq);
+            };
+            requestQueue.add(jsonObjReq);
+        }, "FragmentActivityPoLi");
 
-        Route route = new Route(idRoute[0],
-                ret.encodedRoute,
-                0f,
-                ret.lengthByFoot,
-                ret.lengthByBike,
-                ret.timeByFoot,
-                ret.timeByBike,
-                ret.city);
-
-        Log.e("sendRoute", ret.toString());
-        Log.e("sendRoute", route.toString());
-        Intent intent = new Intent(requireContext(), RoadActivity.class);
-        intent.putExtra("ROUTE", route);
-        startActivity(intent);
     }
 
     private void routeToggleHandler(View view) {

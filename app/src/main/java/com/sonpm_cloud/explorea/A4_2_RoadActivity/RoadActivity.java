@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class RoadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
+    private static final String TAG = "TAG";
     private String url = "https://explorea-server.azurewebsites.net";
 
     private RequestQueue requestQueue;
@@ -87,7 +87,8 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         buttonRate = findViewById(R.id.buttonRate);
 
         requestQueue =  Volley.newRequestQueue(this);
-        buttonRate.setOnClickListener(v -> sendRate());
+        buttonRate.setOnClickListener(v ->
+                LoginActivity.silentSignIn(this, this::sendRate, "RoadActivity"));
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -95,7 +96,6 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         fragmentTransaction.replace(R.id.frameL, fragment).commit();
         findViewById(R.id.buttonStart).setOnClickListener(v ->
                 fragment.launchMap());
-
     }
 
     @Override
