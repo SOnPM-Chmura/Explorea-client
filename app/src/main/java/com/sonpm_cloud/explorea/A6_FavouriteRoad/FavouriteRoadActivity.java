@@ -48,6 +48,7 @@ public class FavouriteRoadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity6_favouriteroad);
+        requestQueue =  Volley.newRequestQueue(this);
 
         connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -55,8 +56,11 @@ public class FavouriteRoadActivity extends AppCompatActivity {
                 && connectivityManager.getActiveNetworkInfo().isAvailable()
                 && connectivityManager.getActiveNetworkInfo().isConnected();
 
-        linearLayoutForRoads = findViewById(R.id.RoadButtonList);
-        requestQueue =  Volley.newRequestQueue(this);
+        if (connected){
+            linearLayoutForRoads = findViewById(R.id.RoadButtonList);
+        } else
+            Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                    .show();
 
     }
 
@@ -128,8 +132,12 @@ public class FavouriteRoadActivity extends AppCompatActivity {
                         }
                     },
                     error -> {
-                        Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-                                .show();
+                        if (!connected){
+                            Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                                    .show();
+                        }else
+                            Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                                    .show();
                         Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
                         Log.w(TAG, "request response:failed msg=" + error.getMessage());
                     }

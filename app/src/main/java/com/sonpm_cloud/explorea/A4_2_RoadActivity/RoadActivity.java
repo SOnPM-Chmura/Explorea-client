@@ -21,7 +21,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.R;
-import com.sonpm_cloud.explorea.data_classes.APIDirectionsDAO;
 import com.sonpm_cloud.explorea.data_classes.Route;
 
 import org.json.JSONObject;
@@ -53,39 +52,20 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
     private Spinner ratingSpinner;
     private Button buttonRate;
 
-//    Fragment fragmentMap;
-//    ViewPager viewPager;
-//    ViewPagerAdapterCreateRoad adapter;
-//    FragmentManager fragmentManager;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity4_2_maps);
 
-
         Route route = (Route) getIntent().getSerializableExtra("ROUTE");
-//        if(route == null){
-//            idRoute = getIntent().getIntExtra("idRoute", -1);
-//            codedRoute = getIntent().getStringExtra("codedRoute");
-//            avgRating = getIntent().getDoubleExtra("avgRating", -1);
-//            lengthByFoot = getIntent().getIntExtra("lengthByFoot", -1);
-//            lengthByBike = getIntent().getIntExtra("lengthByBike", -1);
-//            timeByFoot = getIntent().getIntExtra("timeByFoot", -1);
-//            timeByBike = getIntent().getIntExtra("timeByBike", -1);
-//            city = getIntent().getStringExtra("city");
-//        }
-//        else{
-            idRoute = route.id;
-            codedRoute = route.encodedRoute;
-            avgRating = route.avgRating;
-            lengthByFoot = route.lengthByFoot;
-            lengthByBike = route.lengthByBike;
-            timeByFoot = route.timeByFoot;
-            timeByBike = route.timeByBike;
-            city = route.city;
-//        }
+        idRoute = route.id;
+        codedRoute = route.encodedRoute;
+        avgRating = route.avgRating;
+        lengthByFoot = route.lengthByFoot;
+        lengthByBike = route.lengthByBike;
+        timeByFoot = route.timeByFoot;
+        timeByBike = route.timeByBike;
+        city = route.city;
 
 
         textViewRoad = findViewById(R.id.textViewRoad);
@@ -110,49 +90,13 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         buttonRate.setOnClickListener(v ->
             LoginActivity.silentSignIn(this, this::sendRate, "RoadActivity"));
 
-        //
-//        viewPager = findViewById(R.id.viewPagerForMaps);
-//        fragmentManager = getSupportFragmentManager();
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         FragmentMap fragment = new FragmentMap(route);
         fragmentTransaction.replace(R.id.frameL, fragment).commit();
         findViewById(R.id.buttonStart).setOnClickListener(v ->
                 fragment.launchMap());
-
-
-        //
-//        buttonStart = findViewById(R.id.buttonStart); // add onClick -> go to Google with route
-
     }
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        if (tabLayout != null) {
-//            fragmentMap = new FragmentMap(new Route(idRoute,codedRoute,(float)avgRating,lengthByFoot,lengthByBike,timeByFoot,timeByBike,city));
-//            adapter = new ViewPagerAdapterCreateRoad(fragmentManager,
-//                    Pair.create("Map", fragmentMap));
-//            viewPager.setAdapter(adapter);
-//            tabLayout.setupWithViewPager(viewPager);
-//            viewPager.setOffscreenPageLimit(adapter.fragments.size());
-//        }
-//    }
-
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        finish();
-//    }
-
-//    @Override
-//    public void onRequestPermissionsResult(
-//            int requestCode,
-//            @NonNull String[] permissions,
-//            @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//    }
-
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -180,7 +124,10 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
                 new JSONObject(params),
                 response -> {
 //                    Log.d(" RESPONSE JSONPost", response.toString());
-                    Log.d(" RESPONSE JSONPost", "DODANO OCENE ?");
+                    Log.d(" RESPONSE JSONPost", "DODANO OCENE");
+                    String str = city + " \t " + chosenRate;
+                    textViewRoad.setText(str);
+
                 },
                 error -> {
                     Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)

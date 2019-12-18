@@ -102,6 +102,7 @@ public class LoginActivity extends AppCompatActivity {
             // Signed in successfully, return to main activity
             Intent loginIntent = new Intent(this, MainActivity.class);
             startActivity(loginIntent);
+            finish();
         } catch (ApiException e) {
 
             // The ApiException status code indicates the detailed failure reason.

@@ -34,6 +34,7 @@
     <string name="distBikeTooLong">Distance by bike is too long (%1), maximal is %2 meters</string>
     <string name="pointCountTooSmall">Number of points in route is too small (%1), minimal is %2</string>
     <string name="pointCountTooBig">Number of points in route is too big (%1), maximal is %2</string>
+    <string name="add_city_name">Add city name!</string>
     <string name="select_nav_mthd">Navigation method</string>
     <string name="nav_dialog_pos">Launch</string>
     <string name="nav_dialog_neg">Cancel</string>

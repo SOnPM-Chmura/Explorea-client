@@ -33,6 +33,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
     private static final String TAG = "@@@@@@";//MainActivity.class.getCanonicalName();
     private String url = "https://explorea-server.azurewebsites.net";
     private RequestQueue requestQueue;
+    private boolean connected;
 
     private String[] transports = {"foot", "bike"};
     private String[] times = {"15 min", "30 min", "60 min", "90 min"};
@@ -56,16 +57,19 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity4_searchroad);
+        requestQueue =  Volley.newRequestQueue(this);
 
+        connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager.getActiveNetworkInfo() != null
+        connected = connectivityManager.getActiveNetworkInfo() != null
                 && connectivityManager.getActiveNetworkInfo().isAvailable()
-                && connectivityManager.getActiveNetworkInfo().isConnected()) {
+                && connectivityManager.getActiveNetworkInfo().isConnected();
+
+        if (connected){
 
             cityText = findViewById(R.id.citySelected);
 
             linearLayoutForRoads = findViewById(R.id.RoadButtonList);
-            requestQueue =  Volley.newRequestQueue(this);
 
             Spinner transportSpinner = findViewById(R.id.transportSpinner1);
             Spinner timeSpinner = findViewById(R.id.timeSpinner1);
@@ -120,7 +124,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
         chosenCity = String.valueOf(cityText.getText());
 
         if (chosenCity.equals("")) {
-            Toast.makeText(this, "Podaj miasto", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.add_city_name), Toast.LENGTH_LONG).show();
         } else {
             Log.d("LOG", chosenCity + " " + chosenTime + " " + chosenTransport);
 
@@ -128,7 +132,7 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
             Context context = this;
             JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                     Request.Method.GET,
-                    url + "/routes?cityname=" + chosenCity + "&time=" + chosenTime + "&transport=" + chosenTransport,
+                    url + "/routes?city=" + chosenCity + "&time=" + chosenTime + "&transport=" + chosenTransport,
                     null,
                     response -> {
                         try {
@@ -175,8 +179,12 @@ public class SearchRoadActivity extends AppCompatActivity implements AdapterView
                         }
                     },
                     error -> {
-                        Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-                                .show();
+                        if (!connected){
+                            Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
+                                    .show();
+                        }else
+                            Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                                    .show();
                         Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
                         Log.w(TAG, "request response:failed msg=" + error.getMessage());
                     }
