@@ -107,7 +107,8 @@ public class RoadActivity extends AppCompatActivity implements AdapterView.OnIte
         buttonRate = findViewById(R.id.buttonRate);
 
         requestQueue =  Volley.newRequestQueue(this);
-        buttonRate.setOnClickListener(v -> sendRate());
+        buttonRate.setOnClickListener(v ->
+            LoginActivity.silentSignIn(this, this::sendRate, "RoadActivity"));
 
         //
 //        viewPager = findViewById(R.id.viewPagerForMaps);

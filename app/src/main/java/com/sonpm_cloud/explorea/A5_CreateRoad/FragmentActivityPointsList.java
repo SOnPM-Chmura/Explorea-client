@@ -331,43 +331,46 @@ public class FragmentActivityPointsList extends AbstractGoogleMapContainerFragme
                 lastTimeBike,
                 lastCity);
 
-        Context context = getContext();
-        Map<String, String> params = new HashMap<>();
-        params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
-        params.put("lengthByFoot", String.valueOf(ret.timeByFoot));
-        params.put("lengthByBike", String.valueOf(ret.lengthByBike));
-        params.put("timeByFoot", String.valueOf(ret.timeByFoot));
-        params.put("timeByBike", String.valueOf(ret.timeByBike));
-        params.put("city", "Łodź");//String.valueOf(ret.city));
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(
-                Request.Method.POST,
-                url + "/routes",
-                new JSONObject(params),
-                response -> {
+        Context context = requireContext();
+        LoginActivity.silentSignIn(context, () -> {
+            Map<String, String> params = new HashMap<>();
+            params.put("codedRoute", Route.hexEncode(ret.encodedRoute));
+            params.put("lengthByFoot", String.valueOf(ret.timeByFoot));
+            params.put("lengthByBike", String.valueOf(ret.lengthByBike));
+            params.put("timeByFoot", String.valueOf(ret.timeByFoot));
+            params.put("timeByBike", String.valueOf(ret.timeByBike));
+            params.put("city", "Łodź");//String.valueOf(ret.city));
+            JsonObjectRequest jsonObjReq = new JsonObjectRequest(
+                    Request.Method.POST,
+                    url + "/routes",
+                    new JSONObject(params),
+                    response -> {
 //                    Log.d(" RESPONSE JSONPost", response.toString());
-                    Log.d(" RESPONSE JSONPost", "DODANO TRASE");
-                },
-                error -> {
-                    Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
-                            .show();
-                    Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
-                    Log.w(TAG, "request response:failed msg=" + error.getMessage());
+                        Log.d(" RESPONSE JSONPost", "DODANO TRASE");
+                    },
+                    error -> {
+                        Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
+                             .show();
+                        Log.w(TAG, "request response:failed time=" + error.getNetworkTimeMs());
+                        Log.w(TAG, "request response:failed msg=" + error.getMessage());
+                    }
+            ) {
+                /** Passing some request headers* */
+                @Override
+                public Map getHeaders() {
+                    HashMap headers = new HashMap();
+                    headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
+                    return headers;
                 }
-        ) {
-            /** Passing some request headers* */
-            @Override
-            public Map getHeaders() {
-                HashMap headers = new HashMap();
-                headers.put("authorization", "Bearer " + LoginActivity.account.getIdToken());
-                return headers;
-            }
-        };
-        requestQueue.add(jsonObjReq);
+            };
+            requestQueue.add(jsonObjReq);
 
-        Log.e("sendRoute", ret.toString());
-        Intent intent = new Intent(requireContext(), RoadActivity.class);
-        intent.putExtra("ROUTE", ret);
-        startActivity(intent);
+            Log.e("sendRoute", ret.toString());
+            Intent intent = new Intent(requireContext(), RoadActivity.class);
+            intent.putExtra("ROUTE", ret);
+            startActivity(intent);
+        }, "FragmentActivityPoLi");
+
     }
 
     private void routeToggleHandler(View view) {

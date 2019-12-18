@@ -20,7 +20,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.sonpm_cloud.explorea.A2_Login.LoginActivity;
 import com.sonpm_cloud.explorea.A4_2_RoadActivity.RoadActivity;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             linearLayoutForRoads = findViewById(R.id.RoadButtonList);
             requestQueue =  Volley.newRequestQueue(this);
 
-            sendAddUser();
+            LoginActivity.silentSignIn(this, this::sendAddUser, "MainActivity");
         }
         else {
             Toast.makeText(this, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
@@ -220,8 +222,9 @@ public class MainActivity extends AppCompatActivity {
                 url + "/users",
                 null,
                 response -> {
-//                    Log.d(" RESPONSE JSONPost", response.toString());
-                    Log.d(" RESPONSE JSONPost", "DODANO");
+                    if (response != null)
+                        Log.d(" RESPONSE JSONPost", response.toString());
+//                    Log.d(" RESPONSE JSONPost", "DODANO");
                 },
                 error -> {
                     Toast.makeText(context, getString(R.string.request_error_response_msg), Toast.LENGTH_LONG)
@@ -247,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         Context context = this;
         if (connected) {
             //we are connected to a network
-            sendGetRoutes();
+            LoginActivity.silentSignIn(this, this::sendGetRoutes, "MainActivity");
         }
         else
             Toast.makeText(context, getString(R.string.no_network_connection), Toast.LENGTH_LONG)
